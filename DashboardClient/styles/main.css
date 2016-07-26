@@ -16,6 +16,7 @@ p {
 .navbar-default .navbar-brand {
     color: white !important;
     font-size: 28px;
+    margin-top: 1% !important;
 }
 
 .navbar>.container .navbar-brand, .navbar>.container-fluid .navbar-brand {
@@ -37,3 +38,65 @@ p {
     margin-right: 0px !important;
 }
 
+.legend {
+    padding-top: 30px;
+}
+
+.legend li {
+    width: 115.5px;
+    border-left: 1px solid #394264;
+    text-align: center;                 
+    background: #50597b;
+}
+
+.split {
+    margin: 0;
+    padding: 0 0 5px;
+    font-size: 15px;        
+}
+
+.funny {
+    border-top: 4px solid #e64c65;
+}
+
+.sad {
+    border-top: 4px solid #11a8ab;
+}
+
+.angry {
+    border-top: 4px solid #fcb150;
+}
+
+.shocked {
+    border-top: 4px solid #4fc4f6;
+}
+
+.love {
+    border-top: 4px solid #4fc4f6;
+}
+
+.percentage {
+margin: 0;
+padding: 0 0 5px 5px;
+font-size: 25px;
+}
+
+.horizontal-list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+.horizontal-list li {
+    float: left;
+}
+
+.scnd-font-color {
+    color: #9099b7;
+}
+
+.btn-default {
+    color: #333;
+    background-color: #1f253d !important;
+    border: none !important;
+    color: white !important;
+}

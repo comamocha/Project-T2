@@ -54,7 +54,7 @@
         window.test = []
 
         for (var i = 0; i < 9; i++) {
-          window.trends.push({text: data[i], count: '90'})
+          window.trends.push({text: data[i], count: Math.ceil(Math.random()*100)});
         }
 
         console.log(window.trends);

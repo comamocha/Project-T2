@@ -401,7 +401,7 @@ class Dashboard extends React.Component {
 
     var outline = {
       'background-color': 'rgb(57, 66, 100)',
-      'height': '450px' ,
+      'height': '485px' ,
       'border-radius': '5px'
     }
 
@@ -426,10 +426,9 @@ class Dashboard extends React.Component {
     var sentimentChart = {
       'position': 'relative',
       'left': '70%',
-      'top': '3%',
+      'top': '2%',
       '-webkit-transform': 'translateX(-50%)',
       '-ms-transform': 'translateX(-50%)',
-
       'transform': 'translateX(-50%)',
       'padding-right': '27.5px'
     }
@@ -461,7 +460,7 @@ class Dashboard extends React.Component {
                     }.bind(this))
                   }
                 </NavDropdown>
-                <Button onClick={this.toggleChart.bind(this)}>Toggle Chart</Button>
+                <Button onClick={this.toggleChart.bind(this)}>Toggle Display</Button>
               </Nav>
             </Navbar>
           </Row>
@@ -487,6 +486,33 @@ class Dashboard extends React.Component {
                 <div id="sentimentChart" style={sentimentChart}>
                   {this.state.twitterSpinner ? <Loader color="#26A65B " size="16px" margin="4px"/> : <div></div>}
                 </div>
+                {this.state.currentChart == 'facebookChart' ?  
+
+                                                  <div>
+                                                    <ul className="legend horizontal-list">
+                                                        <li>
+                                                            <p className="love split scnd-font-color">Love</p>
+                                                            <p className="percentage">N/A<sup>%</sup></p>
+                                                        </li>
+                                                        <li>
+                                                            <p className="shocked split scnd-font-color">Shocked</p>
+                                                            <p className="percentage">N/A<sup>%</sup></p>
+                                                        </li>
+                                                        <li>
+                                                            <p className="funny split scnd-font-color">Funny</p>
+                                                            <p className="percentage">N/A<sup>%</sup></p>
+                                                        </li>
+                                                        <li>
+                                                            <p className="sad split scnd-font-color">Sad</p>
+                                                            <p className="percentage">N/A<sup>%</sup></p>
+                                                        </li>
+                                                        <li>
+                                                            <p className="angry split scnd-font-color">Angry</p>
+                                                            <p className="percentage">N/A<sup>%</sup></p>
+                                                        </li>
+                                                    </ul>
+                                                  </div> 
+                                                  : ''} 
               </div>
             </Col>
           </Row>

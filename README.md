@@ -2,20 +2,19 @@
 
 Getting started:
 
-1. Initial setup:
+Initial setup:
 - Run 'npm install' for dependencies
 - 'npm start' will get the server up and running
 - Install MySQL if you haven't already
 
-2. Database Configuration
+Database Configuration:
 - We have been using 'trendwave' as the database name, root' as the username and 'cake' as the password for MySQL (you can change these settings in the database.js file)
 - You will also need to format your database to accept utf8mb4 rather than utf8 (because some headlines use emojis)
-- Run the following to lines in MySQL to reformat:
+- Run the following two lines in MySQL to reformat:
+- to reformat the database: "ALTER DATABASE trendwave CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;"
+- to reformat the table: "ALTER TABLE FB_Sentiments CONVERT TO CHARACTER SET utf8mb4 COLLATE;"
 
-to reformat the database: "ALTER DATABASE trendwave CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;"
-to reformat the table: "ALTER TABLE FB_Sentiments CONVERT TO CHARACTER SET utf8mb4 COLLATE;"
-
-3. Api Keys
+Api Keys:
 - You will need to get api keys for the following:
   Google trends
 	Watson's API
@@ -39,5 +38,7 @@ Overview of Facebook:
 
 We are using Facebook in one capacity: to show the emotional reaction of Facebook users to a specific trend (angry, sad, haha, wow, etc). We are running a python webscraper (path: ./server/facebookScraper/fbScrape.py) to gather all articles and their Facebook reactions from 28 news sources with the on a regular basis. The python scraper can be run manually in the terminal with 'python fbScrape.py'. This process takes roughly ~30 seconds for each news source. These CSV files are then loaded into the FB_Sentiments table in MySQL on a regular basis with a shell script (path: ./server/updateCsv.sh). Once the articles are loaded into the database, we can now query the headline data for keywords that match the keywords of a certain trend. Because the trends from Google may have very specific naming conventions, we found the best query results in MySQL were found by taking the first two keywords of a Google trend. For example, if the Google trend is 'Kyle Cho invents the most amazing app ever' you probably won’t find any news article headlines that use that exact same text convention and the MySQL query would thus return 0 results. However, if you search MySQL using the first two key words 'Kyle Cho', you'll grab a lot more articles relevant to the topic.
 
+Design Schema:
 
+![Alt text](/schema.png?raw=true "Title")
 

@@ -21520,7 +21520,7 @@
 
 	      var outline = {
 	        'background-color': 'rgb(57, 66, 100)',
-	        'height': '450px',
+	        'height': '485px',
 	        'border-radius': '5px'
 	      };
 
@@ -21545,10 +21545,9 @@
 	      var sentimentChart = {
 	        'position': 'relative',
 	        'left': '70%',
-	        'top': '3%',
+	        'top': '2%',
 	        '-webkit-transform': 'translateX(-50%)',
 	        '-ms-transform': 'translateX(-50%)',
-
 	        'transform': 'translateX(-50%)',
 	        'padding-right': '27.5px'
 	      };
@@ -21605,7 +21604,7 @@
 	              _react2.default.createElement(
 	                _reactBootstrap.Button,
 	                { onClick: this.toggleChart.bind(this) },
-	                'Toggle Chart'
+	                'Toggle Display'
 	              )
 	            )
 	          )
@@ -21661,7 +21660,110 @@
 	                'div',
 	                { id: 'sentimentChart', style: sentimentChart },
 	                this.state.twitterSpinner ? _react2.default.createElement(_PulseLoader2.default, { color: '#26A65B ', size: '16px', margin: '4px' }) : _react2.default.createElement('div', null)
-	              )
+	              ),
+	              this.state.currentChart == 'facebookChart' ? _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                  'ul',
+	                  { className: 'legend horizontal-list' },
+	                  _react2.default.createElement(
+	                    'li',
+	                    null,
+	                    _react2.default.createElement(
+	                      'p',
+	                      { className: 'love split scnd-font-color' },
+	                      'Love'
+	                    ),
+	                    _react2.default.createElement(
+	                      'p',
+	                      { className: 'percentage' },
+	                      'N/A',
+	                      _react2.default.createElement(
+	                        'sup',
+	                        null,
+	                        '%'
+	                      )
+	                    )
+	                  ),
+	                  _react2.default.createElement(
+	                    'li',
+	                    null,
+	                    _react2.default.createElement(
+	                      'p',
+	                      { className: 'shocked split scnd-font-color' },
+	                      'Shocked'
+	                    ),
+	                    _react2.default.createElement(
+	                      'p',
+	                      { className: 'percentage' },
+	                      'N/A',
+	                      _react2.default.createElement(
+	                        'sup',
+	                        null,
+	                        '%'
+	                      )
+	                    )
+	                  ),
+	                  _react2.default.createElement(
+	                    'li',
+	                    null,
+	                    _react2.default.createElement(
+	                      'p',
+	                      { className: 'funny split scnd-font-color' },
+	                      'Funny'
+	                    ),
+	                    _react2.default.createElement(
+	                      'p',
+	                      { className: 'percentage' },
+	                      'N/A',
+	                      _react2.default.createElement(
+	                        'sup',
+	                        null,
+	                        '%'
+	                      )
+	                    )
+	                  ),
+	                  _react2.default.createElement(
+	                    'li',
+	                    null,
+	                    _react2.default.createElement(
+	                      'p',
+	                      { className: 'sad split scnd-font-color' },
+	                      'Sad'
+	                    ),
+	                    _react2.default.createElement(
+	                      'p',
+	                      { className: 'percentage' },
+	                      'N/A',
+	                      _react2.default.createElement(
+	                        'sup',
+	                        null,
+	                        '%'
+	                      )
+	                    )
+	                  ),
+	                  _react2.default.createElement(
+	                    'li',
+	                    null,
+	                    _react2.default.createElement(
+	                      'p',
+	                      { className: 'angry split scnd-font-color' },
+	                      'Angry'
+	                    ),
+	                    _react2.default.createElement(
+	                      'p',
+	                      { className: 'percentage' },
+	                      'N/A',
+	                      _react2.default.createElement(
+	                        'sup',
+	                        null,
+	                        '%'
+	                      )
+	                    )
+	                  )
+	                )
+	              ) : ''
 	            )
 	          )
 	        ),
@@ -61401,14 +61503,14 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var container = {
-	  'height': '200px',
+	  'height': '235px',
 	  'float': 'left',
 	  'width': '100%',
 	  'padding-left': '27.5px'
 	};
 
 	var menuBox = {
-	  'height': '200px',
+	  'height': '235px',
 	  'margin-bottom': '25px',
 	  'background': '#394264',
 	  'border-radius': '5px'

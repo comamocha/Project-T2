@@ -5,14 +5,14 @@ import {Image, PageHeader, small} from 'react-bootstrap';
 
 
 var container = {
-	'height': '200px',
+	'height': '235px',
 	'float': 'left',
 	'width': '100%',
   'padding-left': '27.5px'
 }
 
 var menuBox = {
-	'height': '200px',
+	'height': '235px',
 	'margin-bottom': '25px',
 	'background': '#394264',
 	'border-radius': '5px'

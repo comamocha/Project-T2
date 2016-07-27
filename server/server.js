@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 app.use(morgan('dev'));
 app.use('/', routes);
 
-app.use('/', express.static('HomepageClient'));
+app.use('/', express.static('DashboardClient'));
 app.use('/dashboard', express.static('DashboardClient'));
 
 app.listen(3000, function (req, res) {

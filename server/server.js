@@ -20,8 +20,8 @@ app.use('/', routes);
 app.use('/', express.static('HomepageClient'));
 app.use('/dashboard', express.static('DashboardClient'));
 
-app.listen(3000, function (req, res) {
-	console.log('server is listening on 3000');
+app.listen(3333, function (req, res) {
+	console.log('server is listening on 3333');
 });
 
 //////

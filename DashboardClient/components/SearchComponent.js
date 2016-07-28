@@ -27,10 +27,10 @@ export default class SearchComponent extends React.Component {
   render() {
     return (
     	<span className="input">
-      <input placeholder="Search new trends!" onChange={this.addSearch.bind(this)}></input>
-      <span className="input">
-      <Button onClick={this.searchClick.bind(this)}>Search Trend</Button>
-      </span>
+        <input placeholder="Search new trends!" onChange={this.addSearch.bind(this)}></input>
+        <span className="inputSubmit">
+          <Button onClick={this.searchClick.bind(this)}>Search Trend</Button>
+        </span>
       </span>
 
     );

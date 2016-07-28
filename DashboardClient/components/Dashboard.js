@@ -478,8 +478,8 @@ class Dashboard extends React.Component {
                   }
                 </NavDropdown>
                 <Button onClick={this.toggleChart.bind(this)}>Toggle Display</Button>
-                <Search search={this.searchTrend.bind(this)}/>
               </Nav>
+              <Search search={this.searchTrend.bind(this)} />
             </Navbar>
           </Row>
           <Row>

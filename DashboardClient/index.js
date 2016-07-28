@@ -21626,9 +21626,9 @@
 	                _reactBootstrap.Button,
 	                { onClick: this.toggleChart.bind(this) },
 	                'Toggle Display'
-	              ),
-	              _react2.default.createElement(_SearchComponent2.default, { search: this.searchTrend.bind(this) })
-	            )
+	              )
+	            ),
+	            _react2.default.createElement(_SearchComponent2.default, { search: this.searchTrend.bind(this) })
 	          )
 	        ),
 	        _react2.default.createElement(
@@ -60933,7 +60933,7 @@
 	        _react2.default.createElement('input', { placeholder: 'Search new trends!', onChange: this.addSearch.bind(this) }),
 	        _react2.default.createElement(
 	          'span',
-	          { className: 'input' },
+	          { className: 'inputSubmit' },
 	          _react2.default.createElement(
 	            _reactBootstrap.Button,
 	            { onClick: this.searchClick.bind(this) },

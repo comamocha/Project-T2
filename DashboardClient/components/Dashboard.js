@@ -58,6 +58,7 @@ class Dashboard extends React.Component {
     //start everything
     this.getTrends();
     this.updateChart(this.state.twitterData, '#sentimentChart');
+    this.worldMap();
     // this.updateChart(this.state.twitterData, '#sentimentChart');
     // this.updateDonutChart(this.state.facebookData);
     // setInterval(this.getTrends.bind(this), 3000);
@@ -256,6 +257,11 @@ class Dashboard extends React.Component {
     .attr('font-size', '15px')
     .text(function(d) {return d.data.label;});
   }
+
+  worldMap() {
+    var map = new Datamap({element: document.getElementById('worldMapContainer')});
+  }
+
   updateDonutChart (dataset){
     var width = 350,
         height = 350,
@@ -390,65 +396,71 @@ class Dashboard extends React.Component {
 
   render () {
     var header = {
-      'background-color': '#394264',
-      'font-color': 'white',
-      'border-color': 'rgba(231, 231, 231, 0)',
-      'margin-top': '2.5%',
+      backgroundColor: '#394264',
+      fontColor: 'white',
+      borderColor: 'rgba(231, 231, 231, 0)',
+      marginTop: '2.5%',
 
-      'height': '65px',
-      'font-size': '17px',
-      'border-radius': '5px'
+      height: '65px',
+      fontSize: '17px',
+      borderRadius: '5px'
     }
 
     var headerli = {
 
-      'padding': '0 10px',
-      'display': 'block',
-      'line-height': '74px',
-      'font-size': '17px',
-      '-webkit-transition': 'background .3s',
-      'transition': 'background .3s',
+      padding: '0 10px',
+      display: 'block',
+      lineHeight: '74px',
+      fontSize: '17px',
+      webkitTransition: 'background .3s',
+      transition: 'background .3s',
 
-      'margin-top': '10px'
+      marginTop: '10px'
     }
 
     var liColor = {
-      'text-color': 'white'
+      textColor: 'white'
     }
 
     var outline = {
-      'background-color': 'rgb(57, 66, 100)',
-      'height': '485px' ,
-      'border-radius': '5px'
+      backgroundColor: 'rgb(57, 66, 100)',
+      height: '485px' ,
+      borderRadius: '5px'
     }
 
     var titular = {
-    'display': 'block',
-    'line-height': '50px',
-    'text-align': 'center',
-    'border-top-left-radius': '5px',
-    'border-top-right-radius': '5px',
-    'font-size': '17px',
-    'color': 'rgb(255, 255, 255)',
-    'font-weight': 'bold',
-    'background': '#35aadc'
+    display: 'block',
+    lineHeight: '50px',
+    textAlign: 'center',
+    borderTopLeftRadius: '5px',
+    borderTopRightRadius: '5px',
+    fontSize: '17px',
+    color: 'rgb(255, 255, 255)',
+    fontWeight: 'bold',
+    background: '#35aadc'
     }
 
     var glyphOffset = {
-      'marginRight':'15px',
-      'font-size':'25px',
-      'margin-bottom': '10px'
+      marginRight:'15px',
+      fontSize:'25px',
+      marginBottom: '10px'
     }
 
     var sentimentChart = {
-      'position': 'relative',
-      'left': '70%',
-      'top': '2%',
-      '-webkit-transform': 'translateX(-50%)',
-      '-ms-transform': 'translateX(-50%)',
-      'transform': 'translateX(-50%)',
-      'padding-right': '27.5px'
+      position: 'relative',
+      left: '70%',
+      top: '2%',
+      WebkitTransform: 'translateX(-50%)',
+      mstransform: 'translateX(-50%)',
+      transform: 'translateX(-50%)',
+      paddingRight: '27.5px'
     }
+
+    // var mapStyle = {
+    //   position: relative,
+    //   width: 500px,
+    //   height: 300px
+    // }
 
 
     return (
@@ -505,34 +517,39 @@ class Dashboard extends React.Component {
                   {this.state.twitterSpinner ? <Loader color="#26A65B " size="16px" margin="4px"/> : <div></div>}
                 </div>
                 {this.state.currentChart == 'facebookChart' ?  
-
-                                                  <div>
-                                                    <ul className="legend horizontal-list">
-                                                        <li>
-                                                            <p className="love split scnd-font-color">Love</p>
-                                                            <p className="percentage">N/A<sup>%</sup></p>
-                                                        </li>
-                                                        <li>
-                                                            <p className="shocked split scnd-font-color">Shocked</p>
-                                                            <p className="percentage">N/A<sup>%</sup></p>
-                                                        </li>
-                                                        <li>
-                                                            <p className="funny split scnd-font-color">Funny</p>
-                                                            <p className="percentage">N/A<sup>%</sup></p>
-                                                        </li>
-                                                        <li>
-                                                            <p className="sad split scnd-font-color">Sad</p>
-                                                            <p className="percentage">N/A<sup>%</sup></p>
-                                                        </li>
-                                                        <li>
-                                                            <p className="angry split scnd-font-color">Angry</p>
-                                                            <p className="percentage">N/A<sup>%</sup></p>
-                                                        </li>
-                                                    </ul>
-                                                  </div> 
-                                                  : ''} 
+                  <div>
+                    <ul className="legend horizontal-list">
+                        <li>
+                            <p className="love split scnd-font-color">Love</p>
+                            <p className="percentage">N/A<sup>%</sup></p>
+                        </li>
+                        <li>
+                            <p className="shocked split scnd-font-color">Shocked</p>
+                            <p className="percentage">N/A<sup>%</sup></p>
+                        </li>
+                        <li>
+                            <p className="funny split scnd-font-color">Funny</p>
+                            <p className="percentage">N/A<sup>%</sup></p>
+                        </li>
+                        <li>
+                            <p className="sad split scnd-font-color">Sad</p>
+                            <p className="percentage">N/A<sup>%</sup></p>
+                        </li>
+                        <li>
+                            <p className="angry split scnd-font-color">Angry</p>
+                            <p className="percentage">N/A<sup>%</sup></p>
+                        </li>
+                    </ul>
+                  </div> 
+                  : ''} 
               </div>
             </Col>
+          </Row>
+          <Row>
+            <div style={outline}>
+              <h1 style={titular}>World Map</h1>
+              <div id="worldMapContainer" style={{width: 250 + 'px', height: 250 + 'px'}}></div>
+            </div>
           </Row>
           <Row>
 

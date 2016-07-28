@@ -412,7 +412,7 @@ class Dashboard extends React.Component {
       display: 'block',
       lineHeight: '74px',
       fontSize: '17px',
-      -webkitTransition: 'background .3s',
+      webkitTransition: 'background .3s',
       transition: 'background .3s',
 
       marginTop: '10px'

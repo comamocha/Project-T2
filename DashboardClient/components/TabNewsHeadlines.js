@@ -8,7 +8,11 @@ var container = {
 	'height': '235px',
 	'float': 'left',
 	'width': '100%',
-  'padding-left': '27.5px'
+  'padding-left': '27.5px',
+  'overflow':'hidden',
+  'text-overflow':'ellipsis'
+
+
 }
 
 var menuBox = {
@@ -32,7 +36,7 @@ var titular = {
 
 var boxText = {
 	'text-align': 'left',
-    'color': 'white',
+    'color': 'blue',
     'margin-left': '40px',
     'margin-right': '40px'
 }
@@ -50,9 +54,7 @@ const TabNewsHeadlines = (props) => {
     <div style={container}>
       <div style={menuBox}>
           <h2 style={titular}><Glyphicon glyph="globe" style ={glyphOffset}/>{props.header}</h2>
-          <p style={boxText}>{props.sub1}</p>
-          <p style={boxText}>{props.sub2}</p>
-
+          <div style={boxText}>{props.sub1}</div>  <div style={boxText}>{props.sub2}</div>
       </div>
     </div>
   );

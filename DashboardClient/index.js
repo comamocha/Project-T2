@@ -21188,7 +21188,7 @@
 	      facebookSpinner: false, //not likely to be needed
 	      twitterSummary: '',
 	      facebookSummary: '',
-	      NewsTopHeadlines: [["headline1"], ["headline2"]],
+	      NewsTopHeadlines: '',
 	      facebookLikes: '',
 	      currentChart: 'twitterChart'
 
@@ -21219,8 +21219,9 @@
 	      if (this.state.currentChart === "twitterChart") {
 	        this.twitterGrab(e);
 	      } else {
-	        this.facebookGrab(e);
+	        // this.facebookGrab(e);
 	      }
+	      this.updateNewsTopHeadlines(q);
 	      this.topTweetGrab(e);
 	    }
 	  }, {
@@ -21348,9 +21349,9 @@
 	      if (this.state.currentChart === "twitterChart") {
 	        this.twitterGrab(q);
 	      } else {
-	        this.facebookGrab(q);
+	        //this.facebookGrab(q);
 	      }
-	      //this.updateNewsTopHeadlines(q);
+	      this.updateNewsTopHeadlines(q);
 	      this.topTweetGrab(q);
 	    }
 	  }, {
@@ -21398,43 +21399,50 @@
 	      var map = new Datamap({ element: document.getElementById('worldMapContainer') });
 	    }
 
-	    // //***********************
-	    // // NYTimes News Feed 
-	    // //************************
-	    // updateNewsTopHeadlines(keyword) {
-	    //   console.log("updating news headlines.")
-	    //   const api_key = "38618d65ade0456985ffee0915ba6299";
+	    //***********************
+	    // NYTimes News Feed 
+	    //************************
 
-	    //   request.get({
-	    //     url: "https://api.nytimes.com/svc/search/v2/articlesearch.json",
-	    //     qs: {
-	    //       'api-key': api_key,
-	    //       'q': keyword
-	    //     },
-	    //   }, function (err, response, body) {
-	    //     body = JSON.parse(body);
-	    //     console.log(body);
+	  }, {
+	    key: 'updateNewsTopHeadlines',
+	    value: function updateNewsTopHeadlines(keyword) {
+	      var context = this;
+	      console.log("updating news headlines.");
+	      var url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+	      url += '?' + $.param({
+	        'api-key': "38618d65ade0456985ffee0915ba6299",
+	        'q': keyword
+	      });
+	      $.ajax({
+	        url: url,
+	        method: 'GET'
+	      }).done(function (result) {
 
-	    //     //console.log(body.response.docs[0]);
+	        var finalbody = [];
+	        //Go Through news articles and extract snippit
+	        result.response.docs.map(function (article, index) {
+	          //Snippet That is clickable 
+	          //article
+	          if (index < 2) {
+	            finalbody.push(_react2.default.createElement(
+	              'a',
+	              { href: article.web_url },
+	              _react2.default.createElement(
+	                'div',
+	                null,
+	                article.snippet
+	              )
+	            ));
+	          }
 
-
-	    //     //Go Through news articles and extract snippit
-	    //     body.response.docs.map(function (article, index) {
-
-	    //       //Snippet That is clickable 
-	    //       //article
-
-	    //       console.log(article.web_url, article.snippet);
-	    //       //NewsTopHeadlines
-	    //       this.setState({NewsTopHeadlines: article.web_url});
-
-
-	    //     })
-	    //   })
-
-
-	    // }
-
+	          //callback(article.web_url, article.snippet)
+	        });
+	        context.setState({ NewsTopHeadlines: finalbody });
+	        //console.log(result);
+	      }).fail(function (err) {
+	        throw err;
+	      });
+	    }
 	  }, {
 	    key: 'updateDonutChart',
 	    value: function updateDonutChart(dataset) {
@@ -61679,7 +61687,10 @@
 	  'height': '235px',
 	  'float': 'left',
 	  'width': '100%',
-	  'padding-left': '27.5px'
+	  'padding-left': '27.5px',
+	  'overflow': 'hidden',
+	  'text-overflow': 'ellipsis'
+
 	};
 
 	var menuBox = {
@@ -61703,7 +61714,7 @@
 
 	var boxText = {
 	  'text-align': 'left',
-	  'color': 'white',
+	  'color': 'blue',
 	  'margin-left': '40px',
 	  'margin-right': '40px'
 	};
@@ -61726,12 +61737,13 @@
 	        props.header
 	      ),
 	      _react2.default.createElement(
-	        'p',
+	        'div',
 	        { style: boxText },
 	        props.sub1
 	      ),
+	      '  ',
 	      _react2.default.createElement(
-	        'p',
+	        'div',
 	        { style: boxText },
 	        props.sub2
 	      )

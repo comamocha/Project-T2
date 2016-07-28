@@ -1,5 +1,6 @@
 import React from 'react';
 import Tab from './Tab';
+import Search from './SearchComponent';
 
 import LeftTab from './leftTab';
 import MidTab from './MidTab';
@@ -22,6 +23,7 @@ class Dashboard extends React.Component {
   constructor(props){
     super(props);
     this.state = {
+      searchedItem: '',
       trends: [],
       currentTrend: 'Select Trend',
       twitterData:[
@@ -59,6 +61,21 @@ class Dashboard extends React.Component {
     // this.updateChart(this.state.twitterData, '#sentimentChart');
     // this.updateDonutChart(this.state.facebookData);
     // setInterval(this.getTrends.bind(this), 3000);
+  }
+
+  searchTrend (e) {
+    console.log("we made it here ", e)
+    this.setState( {
+      currentTrend: e
+    })
+
+    console.log(this.state.searchedItem);
+    if(this.state.currentChart === "twitterChart"){
+      this.twitterGrab(e);
+    } else {
+      this.facebookGrab(e);
+    }
+    this.topTweetGrab(e);
   }
 
   getTrends () {
@@ -461,6 +478,7 @@ class Dashboard extends React.Component {
                   }
                 </NavDropdown>
                 <Button onClick={this.toggleChart.bind(this)}>Toggle Display</Button>
+                <Search search={this.searchTrend.bind(this)}/>
               </Nav>
             </Navbar>
           </Row>

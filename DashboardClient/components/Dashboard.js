@@ -70,7 +70,7 @@ class Dashboard extends React.Component {
     this.setState( {
       currentTrend: e
     })
-
+    this.getHistory(e);
     console.log(this.state.searchedItem);
     if(this.state.currentChart === "twitterChart"){
       this.twitterGrab(e);
@@ -80,13 +80,29 @@ class Dashboard extends React.Component {
     this.topTweetGrab(e);
   }
 
-  getHistory () {
+  getHistory (q) {
     var context = this;
-    $.get('http://localhost:3000/trends', function(data) {
-      context.setState({
-        historyArray = data
-      })
-    })
+        console.log( 'HKJHHDGLIFUGSLDUFHSDLIFYDGFLAIS>DHGLUASYFGA:IUDHGAKUSYFG:OAIFHKASYGDLA');
+    $.ajax({
+      method: "POST",
+      url: 'http://localhost:3000/history',
+      data: JSON.stringify({q: q}),
+      contentType: "application/json",
+      success: function(d){
+        var history = d;
+        console.log(history, 'THIS IS ALL THE HISTORY DATA')
+        context.setState({
+          historyArray: history
+        })
+      },
+      dataType: 'json'
+    });
+
+    // $.get('http://localhost:3000/history', function(data) {
+    //   context.setState({
+    //     historyArray: data
+    //   })
+    // });
   }
 
   getTrends () {

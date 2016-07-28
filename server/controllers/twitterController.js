@@ -58,7 +58,7 @@ module.exports = {
 			return new Promise(function(resolve, reject) {	
 				grabTweets.get('search/tweets', {q: query, count: 100, result_type: 'recent', lang: 'en', result_type: 'recent', max_id: max_id}, function(error, tweets) {
 				  if (error) {
-				 		reject(err) 
+				 		reject(error) 
 				  } else {
 
 				  	// Declare cash variable used later to get the new max_id

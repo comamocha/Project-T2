@@ -8,7 +8,7 @@ router.route('/trends')
 	.get(trendController.getTrends)
 
 router.route('/history')
-	.get(trendController.trendHistory)
+	.post(trendController.trendHistory)
 
 // Requests to grab the tweets on a given topic
 router.route('/grabTweets')

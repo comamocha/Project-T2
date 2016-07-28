@@ -100,3 +100,21 @@ font-size: 25px;
     border: none !important;
     color: white !important;
 }
+
+span {   
+    position: fixed;
+    height: 95%;
+    margin-left: 15px;
+    margin-right: 15px;
+    top: 27px;
+}
+
+span input {
+    margin-left: 330px;
+}
+
+input {
+    border-radius: 10px;
+    height: 40px;
+    width: 150px;
+}

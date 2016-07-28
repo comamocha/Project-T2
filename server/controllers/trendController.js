@@ -13,5 +13,14 @@ module.exports = {
 		.catch(function(err){
 			console.log(err);
 		})
+	},
+
+	trendHistory: function(req, res, next) {
+		// Return the hisorical data from search
+		googleTrends.trendData(req.data)
+		.then(function(data) {
+			console.log(data);
+		})
 	}
+
 }

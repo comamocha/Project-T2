@@ -25,6 +25,7 @@ class Dashboard extends React.Component {
     this.state = {
       searchedItem: '',
       trends: [],
+      historyArray: [],
       currentTrend: 'Select Trend',
       twitterData:[
         {label: 'positive', score: 50},
@@ -77,6 +78,15 @@ class Dashboard extends React.Component {
       this.facebookGrab(e);
     }
     this.topTweetGrab(e);
+  }
+
+  getHistory () {
+    var context = this;
+    $.get('http://localhost:3000/trends', function(data) {
+      context.setState({
+        historyArray = data
+      })
+    })
   }
 
   getTrends () {
@@ -498,7 +508,7 @@ class Dashboard extends React.Component {
 
             <Col xs={6} md={4}><LeftTab info={this.state.trendHistory} header={this.state.currentTrend} sub={"Trend Score: " + Math.ceil(Math.random()  * 100)}/></Col>
             <Col xs={6} md={4}><MidTab loading={this.state.twitterSpinner} info={this.state.publicSentiment} header="PUBLIC SENTIMENT" sub={this.state.twitterSummary}/></Col>
-            <Col xs={6} md={4}><RightTab info={this.state.emotionalFeedback} header={"EMOTIONAL FEEDBACK"} sub={this.state.facebookSummary}/></Col>
+            <Col xs={6} md={4}><RightTab info={this.state.emotionalFeedback} header={"TREND OVER TIME (1 YEAR)"} sub={this.state.facebookSummary}/></Col>
           </Row>
           <Row>
             <Col md={6} mdPush={6}>

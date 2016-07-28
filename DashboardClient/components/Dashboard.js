@@ -82,7 +82,6 @@ class Dashboard extends React.Component {
 
   getHistory (q) {
     var context = this;
-        console.log( 'HKJHHDGLIFUGSLDUFHSDLIFYDGFLAIS>DHGLUASYFGA:IUDHGAKUSYFG:OAIFHKASYGDLA');
     $.ajax({
       method: "POST",
       url: 'http://localhost:3000/history',
@@ -97,12 +96,6 @@ class Dashboard extends React.Component {
       },
       dataType: 'json'
     });
-
-    // $.get('http://localhost:3000/history', function(data) {
-    //   context.setState({
-    //     historyArray: data
-    //   })
-    // });
   }
 
   getTrends () {
@@ -226,6 +219,7 @@ class Dashboard extends React.Component {
     } else {
       this.facebookGrab(q);
     }
+    this.getHistory(q);
     this.topTweetGrab(q);
   }
 
@@ -405,6 +399,79 @@ class Dashboard extends React.Component {
         return function(t) { return arc(i(t)); };
       };
     }
+
+  }
+
+  historyScale(b) {
+    // use d3 to create a line graph related to the trends of each month for the past year
+    // use scale.ticks(d3.time.month, 1) to have correct ticks on x axis
+    var dates = [];
+    for (var i = 0; i < this.state.historyArray.length; i++) {
+      dates.push(this.state.historyArray[i].keys());
+    }
+
+    var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 200 - margin.left - margin.right,
+    height = 150 - margin.top - margin.bottom;
+
+var formatDate = d3.time.format("%B %Y");
+
+var x = d3.time.scale()
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var line = d3.svg.line()
+    .x(function(d) { console.log(d, 'IN THE DOT X FUNCTION FOR d');return x(d.date); })
+    .y(function(d) { return y(d.close); });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv("data.tsv", type, function(error, data) {
+  if (error) throw error;
+
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+  y.domain(d3.extent(data, function(d) { return d.close; }));
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Price ($)");
+
+  svg.append("path")
+      .datum(data)
+      .attr("class", "line")
+      .attr("d", line);
+});
+
+function type(d) {
+  d.date = formatDate.parse(d.date);
+  d.close = +d.close;
+  return d;
+}
   }
 
   toggleChart () {
@@ -522,7 +589,7 @@ class Dashboard extends React.Component {
           </Row>
           <Row>
 
-            <Col xs={6} md={4}><LeftTab info={this.state.trendHistory} header={this.state.currentTrend} sub={"Trend Score: " + Math.ceil(Math.random()  * 100)}/></Col>
+            <Col xs={6} md={4}><LeftTab info={this.state.trendHistory} header={this.state.currentTrend.toUpperCase()} sub={"Trend Score: " + Math.ceil(Math.random()  * 100)}/></Col>
             <Col xs={6} md={4}><MidTab loading={this.state.twitterSpinner} info={this.state.publicSentiment} header="PUBLIC SENTIMENT" sub={this.state.twitterSummary}/></Col>
             <Col xs={6} md={4}><RightTab info={this.state.emotionalFeedback} header={"TREND OVER TIME (1 YEAR)"} sub={this.state.facebookSummary}/></Col>
           </Row>

@@ -24,34 +24,3 @@ app.listen(3000, function (req, res) {
 	console.log('server is listening on 3000');
 });
 
-//////
-
-// var task = cron.schedule('* * * * *', function() {
-//   console.log('Server is still running');
-// }, false);
-
-
-// var csvScheduler = cron.schedule('* * * * *', function() {
-//   console.log('Update CSV running');
-//   exec(__dirname + '/updateCSV.sh', function(error, stdout, stderr) {
-//       console.log('stdout: ', stdout);
-//       console.log('stderr: ', stderr);
-//       if (error !== null) {
-//           console.log('exec error: ', error);
-//       }
-//   });
-// }, false);
-
-
-// var facebookScrapeScheduler = cron.schedule('* * * * *', function() {
-//   console.log('Facebook Scraper running');
-//     var process = spawn('python',['/facebookScraper/fbScrape.py']);
-// }, false);
-
-
-
-
-// task.start();
-// csvScheduler.start();
-// facebookScrapeScheduler.start();
-

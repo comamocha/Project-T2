@@ -1,25 +1,28 @@
 import React from 'react';
 import Tab from './Tab';
 import Search from './SearchComponent';
-
 import LeftTab from './leftTab';
 import MidTab from './MidTab';
 import RightTab from './RightTab';
 import TabPopularTweets from './TabPopularTweets';
 import TabNewsHeadlines from './TabNewsHeadlines';
 import ReactDOM from 'react-dom';
-
 import Loader from 'halogen/PulseLoader';
 
 import {Grid, Row, Col, Clearfix, Panel, Well, Button, Glyphicon} from 'react-bootstrap';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, Image, Jumbotron} from 'react-bootstrap';
 import {Router, Route, Link, hashHistory, IndexRoute} from 'react-router';
-//import request from 'request';
+
 
 var styles = {
   'background-color': 'black'
 }
 
+/****************************************
+ * Dashboard 
+ * Contains most React Logic to update website 
+ * **************************************
+ */
 class Dashboard extends React.Component {
   constructor(props){
     super(props);
@@ -86,6 +89,7 @@ class Dashboard extends React.Component {
     }
   }
 
+
   componentDidMount () {
     //start everything
     this.getTrends();
@@ -94,6 +98,10 @@ class Dashboard extends React.Component {
     this.googleTrendGrab('US');
   }
 
+
+/**************************
+ * Map Component Logic
+ **************************/
   handleFormChange (e) {
     var clickedCountry = e.target.value;
     //Toggle former selected country's map color to default
@@ -135,8 +143,10 @@ class Dashboard extends React.Component {
     });
   }
 
+
+
+
   searchTrend (e) {
-    console.log("we made it here ", e)
     this.setState( {
       currentTrend: e
     })
@@ -147,12 +157,13 @@ class Dashboard extends React.Component {
     } else {
      // this.facebookGrab(e);
     }
-     this.updateNewsTopHeadlines(q);
+    this.updateNewsTopHeadlines(q);
     this.topTweetGrab(e);
   }
 
+   //pull in data from google trends to populate dropdown menu
   getTrends () {
-    //pull in data from google trends to populate dropdown menu
+   
     var context = this;
     $.get('http://localhost:3000/trends', function(data){
 
@@ -163,8 +174,9 @@ class Dashboard extends React.Component {
     });
   }
 
+
+  //pull in twitter data from watson to populate twitter chart
   twitterGrab (q) {
-    //pull in twitter data from watson to populate twitter chart
     var context = this;
     this.setState({
       currentTrend: q,
@@ -191,6 +203,7 @@ class Dashboard extends React.Component {
       dataType: 'json'
     });
   }
+
 
   facebookGrab (q) {
     //grab facebook data for fb chart
@@ -372,9 +385,13 @@ class Dashboard extends React.Component {
     });
   }
 
-  //***********************
-  // NYTimes News Feed 
-  //************************
+// News Component
+/**
+ * updateNewsTopHeadlines()
+ *
+ * @param {String} keyword that the news component is searching for
+ * @return {Element} updates prop: NewsTopHeadlines
+ */
   updateNewsTopHeadlines(keyword) {
     var context = this;
     console.log("updating news headlines.")
@@ -387,33 +404,27 @@ class Dashboard extends React.Component {
       url: url,
       method: 'GET',
     }).done(function (result) {
-      
+
       var finalbody = [];
       //Go Through news articles and extract snippit
       result.response.docs.map(function (article, index) {
+
         //Snippet That is clickable 
-        //article
-        if(index < 2){
+        //Number of articles to display 
+        if (index < 2) {
           finalbody.push(
             <a href={article.web_url}>
-            <div> 
-          {article.snippet} 
-          </div></a>)
+              <div>
+                {article.snippet}
+              </div></a>)
         }
-        
-        //callback(article.web_url, article.snippet)
 
       })
-      context.setState({NewsTopHeadlines:  finalbody  });
-      //console.log(result);
+      context.setState({ NewsTopHeadlines: finalbody });
+
     }).fail(function (err) {
       throw err;
     });
-    
-
-  
-
-
   }
 
   updateDonutChart (dataset){
@@ -421,8 +432,6 @@ class Dashboard extends React.Component {
         height = 350,
         outerRadius = Math.min(width, height) * .5 - 10,
         innerRadius = outerRadius * .6;
-
-    // emoDataset 
 
     // var dummyDataSet = [null, 20, 20, 20, 20, 20];
     // console.log('this is the dataset: ', dataset)
@@ -535,6 +544,15 @@ class Dashboard extends React.Component {
     }
   }
 
+
+
+/**
+ * toggleChart() 
+ * logic that toggles sentiment chart in the Sentiment analysis component
+ *
+ * @param {String} tag
+ * @return {Element} element
+ */
   toggleChart () {
     var currentChart = d3.select('#sentimentChart').selectAll('svg');
     var currentChartClass = currentChart[0][0].className.animVal;
@@ -548,6 +566,12 @@ class Dashboard extends React.Component {
     }
   }
 
+
+
+
+/**
+ * render() updates the DOM
+ */
   render () {
     var header = {
       backgroundColor: '#394264',

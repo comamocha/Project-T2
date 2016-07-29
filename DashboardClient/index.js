@@ -21158,11 +21158,15 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	//import request from 'request';
-
 	var styles = {
 	  'background-color': 'black'
 	};
+
+	/****************************************
+	 * Dashboard 
+	 * Contains most React Logic to update website 
+	 * **************************************
+	 */
 
 	var Dashboard = function (_React$Component) {
 	  _inherits(Dashboard, _React$Component);
@@ -21173,8 +21177,9 @@
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Dashboard).call(this, props));
 
 	    _this.state = {
-	      countriesArr: null,
-	      formValue: 'US',
+	      map: null,
+	      countriesArr: [['Argentina', 'AR', 'ARG'], ['Australia', 'AU', 'AUS'], ['Austria', 'AT', 'AUT'], ['Belgium', 'BE', 'BEL'], ['Brazil', 'BR', 'BRA'], ['Canada', 'CA', 'CAN'], ['Chile', 'CL', 'CHL'], ['Colombia', 'CO', 'COL'], ['France', 'FR', 'FRA'], ['Germany', 'DE', 'DEU'], ['India', 'IN', 'IND'], ['Italy', 'IT', 'ITA'], ['Japan', 'JP', 'JPN'], ['Malaysia', 'MY', 'MYS'], ['Mexico', 'MX', 'MEX'], ['Netherlands', 'NL', 'NLD'], ['Norway', 'NO', 'NOR'], ['Philippines', 'PH', 'PHL'], ['Poland', 'PL', 'POL'], ['Portugal', 'PT', 'PRT'], ['Russia', 'RU', 'RUS'], ['Sweden', 'SE', 'SWE'], ['Switzerland', 'CH', 'CHE'], ['Turkey', 'TR', 'TUR'], ['United Kingdom', 'GB', 'GBR'], ['United States', 'US', 'USA'], ['Vietnam', 'VN', 'VNM']],
+	      selectedCountry: 'US',
 	      searchedItem: '',
 	      trends: [],
 	      currentTrend: 'Select Trend',
@@ -21207,16 +21212,48 @@
 	      this.worldMap();
 	      this.googleTrendGrab('US');
 	    }
-	  }, {
-	    key: 'componentWillMount',
-	    value: function componentWillMount() {
-	      this.setCountriesInState();
-	    }
+
+	    /**************************
+	     * Map Component Logic
+	     **************************/
+
 	  }, {
 	    key: 'handleFormChange',
 	    value: function handleFormChange(e) {
-	      console.log(e.target.value);
-	      this.setState({ formValue: e.target.value });
+	      var clickedCountry = e.target.value;
+	      //Toggle former selected country's map color to default
+	      this.toggleMapColors(clickedCountry);
+
+	      //Change the selected country in state
+	      this.setState({ selectedCountry: e.target.value });
+
+	      //Toggle new selected country's map color to default
+	      //Uses setTimeout because the setState requires time to update
+	      setTimeout(function () {
+	        this.toggleMapColors(clickedCountry);
+	      }.bind(this), 250);
+	    }
+	  }, {
+	    key: 'toggleMapColors',
+	    value: function toggleMapColors(clickedCountry) {
+	      //Google's Trend API requires 2-digit country-codes
+	      //Datamaps requires 3-digit country-codes
+	      //For loop will find the corresponding 3-digit country-code for selected item
+	      var countryCode = null;
+	      for (var i = 0; i < this.state.countriesArr.length; i++) {
+	        if (this.state.countriesArr[i][1] === this.state.selectedCountry) {
+	          countryCode = this.state.countriesArr[i][2];
+	        }
+	      }
+
+	      //Create the object to toggle map color 
+	      var toggleVar = this.state.map.options.data[countryCode]['fillKey'] === 'SELECTED';
+	      var fillKey = toggleVar ? 'UNSELECTED' : 'SELECTED';
+	      var obj = {};
+	      obj[countryCode] = { fillKey: fillKey };
+
+	      //Update map color
+	      this.state.map.updateChoropleth(obj);
 	    }
 	  }, {
 	    key: 'googleTrendGrab',
@@ -21229,7 +21266,6 @@
 	  }, {
 	    key: 'searchTrend',
 	    value: function searchTrend(e) {
-	      console.log("we made it here ", e);
 	      this.setState({
 	        currentTrend: e
 	      });
@@ -21243,10 +21279,13 @@
 	      this.updateNewsTopHeadlines(q);
 	      this.topTweetGrab(e);
 	    }
+
+	    //pull in data from google trends to populate dropdown menu
+
 	  }, {
 	    key: 'getTrends',
 	    value: function getTrends() {
-	      //pull in data from google trends to populate dropdown menu
+
 	      var context = this;
 	      $.get('http://localhost:3000/trends', function (data) {
 
@@ -21255,10 +21294,12 @@
 	        });
 	      });
 	    }
+
+	    //pull in twitter data from watson to populate twitter chart
+
 	  }, {
 	    key: 'twitterGrab',
 	    value: function twitterGrab(q) {
-	      //pull in twitter data from watson to populate twitter chart
 	      var context = this;
 	      this.setState({
 	        currentTrend: q,
@@ -21418,7 +21459,7 @@
 	  }, {
 	    key: 'worldMap',
 	    value: function worldMap() {
-	      var map = new Datamap({
+	      this.state.map = new Datamap({
 	        element: document.getElementById('worldMapContainer'),
 	        responsive: true,
 	        geographyConfig: {
@@ -21430,34 +21471,38 @@
 	          }
 	        },
 	        fills: {
-	          HIGH: '#afafaf',
-	          LOW: '#123456',
-	          MEDIUM: 'blue',
-	          UNKNOWN: 'rgb(0,0,0)',
-	          defaultFill: 'green'
+	          SELECTED: 'red',
+	          UNSELECTED: 'green',
+	          defaultFill: 'gray'
 	        }
+	      });
 
+	      var selectedCountry = this.state.selectedCountry;
+	      var map = this.state.map;
+	      this.state.countriesArr.map(function (triple) {
+	        var obj = {};
+	        if (triple[1] === selectedCountry) {
+	          console.log('inside true');
+	          obj[triple[2]] = { 'fillKey': 'SELECTED' };
+	        } else {
+	          console.log('inside false');
+	          obj[triple[2]] = { 'fillKey': 'UNSELECTED' };
+	        }
+	        map.updateChoropleth(obj);
 	      });
 
 	      d3.select(window).on('resize', function () {
 	        map.resize();
 	      });
 	    }
-	  }, {
-	    key: 'setCountriesInState',
-	    value: function setCountriesInState() {
-	      var countries = Datamap.prototype.worldTopo.objects.world.geometries;
-	      var countriesArr = [];
-	      for (var i = 0; i < countries.length; i++) {
-	        countriesArr.push([countries[i].properties.name, countries[i].id]);
-	      }
-	      this.setState({ countriesArr: countriesArr });
-	      this.updateCountriesOptions;
-	    }
 
-	    //***********************
-	    // NYTimes News Feed 
-	    //************************
+	    // News Component
+	    /**
+	     * updateNewsTopHeadlines()
+	     *
+	     * @param {String} keyword that the news component is searching for
+	     * @return {Element} updates prop: NewsTopHeadlines
+	     */
 
 	  }, {
 	    key: 'updateNewsTopHeadlines',
@@ -21477,8 +21522,9 @@
 	        var finalbody = [];
 	        //Go Through news articles and extract snippit
 	        result.response.docs.map(function (article, index) {
+
 	          //Snippet That is clickable 
-	          //article
+	          //Number of articles to display 
 	          if (index < 2) {
 	            finalbody.push(_react2.default.createElement(
 	              'a',
@@ -21490,11 +21536,8 @@
 	              )
 	            ));
 	          }
-
-	          //callback(article.web_url, article.snippet)
 	        });
 	        context.setState({ NewsTopHeadlines: finalbody });
-	        //console.log(result);
 	      }).fail(function (err) {
 	        throw err;
 	      });
@@ -21506,8 +21549,6 @@
 	          height = 350,
 	          outerRadius = Math.min(width, height) * .5 - 10,
 	          innerRadius = outerRadius * .6;
-
-	      // emoDataset 
 
 	      // var dummyDataSet = [null, 20, 20, 20, 20, 20];
 	      // console.log('this is the dataset: ', dataset)
@@ -21609,6 +21650,15 @@
 	        };
 	      }
 	    }
+
+	    /**
+	     * toggleChart() 
+	     * logic that toggles sentiment chart in the Sentiment analysis component
+	     *
+	     * @param {String} tag
+	     * @return {Element} element
+	     */
+
 	  }, {
 	    key: 'toggleChart',
 	    value: function toggleChart() {
@@ -21623,6 +21673,11 @@
 	        this.setState({ currentChart: 'twitterChart' });
 	      }
 	    }
+
+	    /**
+	     * render() updates the DOM
+	     */
+
 	  }, {
 	    key: 'render',
 	    value: function render() {
@@ -21924,23 +21979,24 @@
 	            _react2.default.createElement('div', { id: 'worldMapContainer', style: { top: '-15%', height: '90%' } }),
 	            _react2.default.createElement(
 	              'form',
-	              { onSubmit: this.googleTrendGrab(this.state.formValue) },
-	              'Select a country:',
+	              { onSubmit: this.googleTrendGrab(this.state.selectedCountry) },
+	              _react2.default.createElement(
+	                'p',
+	                { style: { color: 'white' } },
+	                'Select a country:'
+	              ),
 	              _react2.default.createElement(
 	                'select',
-	                { id: 'countriesDropDown', name: 'Countries', value: this.state.formValue,
+	                { id: 'countriesDropDown', name: 'Countries', value: this.state.selectedCountry,
 	                  onChange: this.handleFormChange.bind(this) },
 	                this.state.countriesArr.map(function (tuple) {
 	                  return _react2.default.createElement(
 	                    'option',
-	                    { value: tuple[0] },
+	                    { value: tuple[1] },
 	                    tuple[0]
 	                  );
 	                })
-	              ),
-	              _react2.default.createElement('br', null),
-	              _react2.default.createElement('br', null),
-	              _react2.default.createElement('input', { type: 'submit' })
+	              )
 	            )
 	          )
 	        ),

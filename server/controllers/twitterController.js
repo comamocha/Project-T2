@@ -6,6 +6,7 @@ var api_key = require('../../api_keys.js')
 var db = require('../database');
 var watson = require('watson-developer-cloud');
 var Promise = require('bluebird');
+var {getSentiment, politicalAnalysis, emotionalAnalysis, personalityTraits} = require('./IndicoApi.js')
 
 // We are using the 'watson-developer-cloud' npm module
 // See documentation for examples of how to request data from Watson using this module
@@ -17,17 +18,17 @@ var alchemy_language = watson.alchemy_language({
 
 // Function to get the positive vs. negative sentiment from Watson
 // Written as a promise so multiple requests can be made, if needed
-var getSentiment = function(params) {
-	return new Promise(function(resolve, reject) {
-		alchemy_language.sentiment(params, function (err, response) {
-		  if (err) {
-		    reject(err);
-		  } else {
-		  	resolve(response.docSentiment);
-		  }
-		});
-	})
-};
+// var getSentiment = function(params) {
+// 	return new Promise(function(resolve, reject) {
+// 		alchemy_language.sentiment(params, function (err, response) {
+// 		  if (err) {
+// 		    reject(err);
+// 		  } else {
+// 		  	resolve(response.docSentiment);
+// 		  }
+// 		});
+// 	})
+// };
 
 module.exports = {
 	
@@ -116,23 +117,25 @@ module.exports = {
 									delete storage[key]
 								}
 							}
+							console.log("here!!!")
 						
-							getSentiment({text: tweetString}).then(function(data) {
+							getSentiment(tweetString).then(function(data) {
 								
 								var positive = 0;
 								var negative = 0;
+								console.log(data)
 
-								if (data.type === 'positive') {
-									// reweight the positive and negative scores to add up to 100%
-									positive = (1 + Number(data.score)) / 2;
-									negative = 1 - positive;
-									res.send({summary: 'Mostly Positive', positive: positive, negative: negative});									
-								} else {
-									// reweight the positive and negative scores to add up to 100%
-									negative = Math.abs((Number(data.score) - 1) / 2);
-									positive = 1 - negative;
-									res.send({summary: 'Mostly Negative', positive: positive, negative: negative});
-								}
+								// if (data.type === 'positive') {
+								// 	// reweight the positive and negative scores to add up to 100%
+								// 	positive = (1 + Number(data.score)) / 2;
+								// 	negative = 1 - positive;
+								// 	res.send({summary: 'Mostly Positive', positive: positive, negative: negative});									
+								// } else {
+								// 	// reweight the positive and negative scores to add up to 100%
+								// 	negative = Math.abs((Number(data.score) - 1) / 2);
+								// 	positive = 1 - negative;
+								// 	res.send({summary: 'Mostly Negative', positive: positive, negative: negative});
+								// }
 							});
 							
 						});

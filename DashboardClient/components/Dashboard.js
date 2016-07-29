@@ -60,9 +60,16 @@ class Dashboard extends React.Component {
     this.getTrends();
     this.updateChart(this.state.twitterData, '#sentimentChart');
     this.worldMap();
+    this.googleTrendGrab('US');
     // this.updateChart(this.state.twitterData, '#sentimentChart');
     // this.updateDonutChart(this.state.facebookData);
     // setInterval(this.getTrends.bind(this), 3000);
+  }
+
+  googleTrendGrab (countryCode) {
+    $.get('http://localhost:3000/test', countryCode, function(list) {
+      document.getElementById('googleTrendGrabTarget').innerText = list;
+    });
   }
 
   searchTrend (e) {
@@ -107,6 +114,9 @@ class Dashboard extends React.Component {
       data: JSON.stringify({q: q}),
       contentType: "application/json",
       success: function(d){
+        setTimeout(function() {
+          console.log(d);
+        }, 2000);
         context.setState({
           twitterData: [{label: 'positive', score:d.positive},{label:'negative', score:d.negative}],
           twitterSpinner: false,
@@ -263,7 +273,30 @@ class Dashboard extends React.Component {
   }
 
   worldMap() {
-    var map = new Datamap({element: document.getElementById('worldMapContainer')});
+    var map = new Datamap({
+      element: document.getElementById('worldMapContainer'),
+      // scope: 'usa',
+      responsive: true,
+      geographyConfig: {
+        popupOnHover: true,
+        popupTemplate: function(geography, data) { // This function should just return a string
+          // var lookup = googleTrendGrab(geography.properties.name);
+          return googleTrendGrab(geography.properties.name);
+        }
+      },
+      fills: {
+          HIGH: '#afafaf',
+          LOW: '#123456',
+          MEDIUM: 'blue',
+          UNKNOWN: 'rgb(0,0,0)',
+          defaultFill: 'green'
+      }
+
+    });
+
+    d3.select(window).on('resize', function() {
+      map.resize();
+    });
   }
 
 
@@ -597,11 +630,14 @@ class Dashboard extends React.Component {
           <Row>
             <div style={outline}>
               <h1 style={titular}>World Map</h1>
-              <div id="worldMapContainer" style={{width: 250 + 'px', height: 250 + 'px'}}></div>
+              <div id="worldMapContainer" style={{top: '-15%', height: '90%'}}></div>
+              <form>
+                
+              </form>
             </div>
           </Row>
           <Row>
-
+            <div id='googleTrendGrabTarget' style={{color: 'white'}}></div>
           </Row>
       </Grid>
     );

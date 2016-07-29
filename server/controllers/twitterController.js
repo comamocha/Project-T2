@@ -30,7 +30,68 @@ var getSentiment = function(params) {
 };
 
 module.exports = {
-	
+	test: function(req, res) {
+		var country = req._parsedUrl.query;
+		console.log('Google Trends searching for', country);
+		googleTrends.hotTrends(country)
+		.then(function(results){
+			var trends = '\n';
+			results.forEach(function(item) {
+				trends += item + "\n";
+			});
+	    res.send("Here are your google trend results for " + country + "!" + trends);
+		})
+		.catch(function(err){
+	    res.send("there was an error :(" + err);
+		});
+
+
+		// var tweetStr = '\n';
+		// var grabTweets = new Twitter({
+		//  consumer_key: api_key.consumer_key,
+		//  consumer_secret: api_key.consumer_secret,
+		//  access_token_key: api_key.access_token_key,
+		//  access_token_secret: api_key.access_token_secret
+		// });
+
+		// var options = {
+	 //    geo: 'US',
+	 //    date: '201607',
+	 //    keywords: ['test', 'test'],
+	 //    category: 'test'
+		// }
+		 
+
+		// var callTwitter = function() {
+		// 	return new Promise(function(resolve, reject) {	
+		// 		grabTweets.get('search/tweets', {
+		// 			q: query,
+		// 			geocode: '42.877742,-97.380979,3000mi',
+		// 			count: 3, 
+		// 			result_type: 'recent', 
+		// 			lang: 'en', 
+		// 			result_type: 'recent', 
+		// 			max_id: 1000000000000000000000000000
+		// 		}, function(error, tweets) {
+		// 		  if (error) {
+		// 		 		reject(error) 
+		// 		  } else {
+		// 		  	resolve(
+		// 			   	tweets.statuses.forEach(function(tweetObj, index) {
+		// 			   		grabTweets.get('search')
+		// 			   		tweetObj.id
+		// 			      tweetStr += JSON.stringify(tweetObj) + "\n\n\n"
+		// 			    })
+		// 		    )
+		// 		  }
+		// 		})
+		// 	})		
+		// }
+
+		// callTwitter().then(function() {
+		// 	res.send(tweetStr);
+		// });
+	},
 	// grabTweets makes five requests to Twitter to pull the ~500 most recent tweet data on a topic
 	// then the tweet data is sent in aggregate to Watson for analysis
 	grabTweets: function(req, res) {
@@ -56,7 +117,14 @@ module.exports = {
 		// Promise function to get the 100 most recent Tweets from twitter
 		var callTwitter = function() {
 			return new Promise(function(resolve, reject) {	
-				grabTweets.get('search/tweets', {q: query, count: 100, result_type: 'recent', lang: 'en', result_type: 'recent', max_id: max_id}, function(error, tweets) {
+				grabTweets.get('search/tweets', {
+					q: query, 
+					count: 100, 
+					result_type: 'recent', 
+					lang: 'en', 
+					result_type: 'recent', 
+					max_id: max_id
+				}, function(error, tweets) {
 				  if (error) {
 				 		reject(err) 
 				  } else {

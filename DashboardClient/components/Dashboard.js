@@ -1,5 +1,3 @@
-import React from 'react';
-import Tab from './Tab';
 import Search from './SearchComponent';
 
 import LeftTab from './leftTab';

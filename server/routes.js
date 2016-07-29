@@ -7,6 +7,9 @@ var facebookController = require('./controllers/facebookController.js');
 router.route('/trends')
 	.get(trendController.getTrends)
 
+router.route('/history')
+	.post(trendController.trendHistory)
+
 // Requests to grab the tweets on a given topic
 router.route('/grabTweets')
 	.post(twitterController.grabTweets)

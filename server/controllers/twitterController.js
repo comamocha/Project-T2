@@ -30,7 +30,21 @@ var getSentiment = function(params) {
 };
 
 module.exports = {
-	
+	test: function(req, res) {
+	  var country = req._parsedUrl.query;
+	  console.log('Google Trends searching for', country);
+	  googleTrends.hotTrends(country)
+	  .then(function(results){
+	    var trends = '\n';
+	    results.forEach(function(item) {
+	      trends += item + "\n";
+	    });
+	    res.send("Here are your google trend results for " + country + "!" + trends);
+	  })
+	  .catch(function(err){
+	    res.send("there was an error :(" + err);
+	  });
+	},
 	// grabTweets makes five requests to Twitter to pull the ~500 most recent tweet data on a topic
 	// then the tweet data is sent in aggregate to Watson for analysis
 	grabTweets: function(req, res) {

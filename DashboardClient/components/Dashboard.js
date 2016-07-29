@@ -136,13 +136,6 @@ class Dashboard extends React.Component {
     });
   }
 
-  googleTrendGrab (countryCode) {
-    console.log('googleTrendGrab countryCode is', countryCode);
-    $.get('http://localhost:3000/test', countryCode, function(list) {
-      document.getElementById('googleTrendGrabTarget').innerText = list;
-    });
-  }
-
   searchTrend (e) {
     console.log("we made it here ", e)
     this.setState( {
@@ -203,9 +196,6 @@ getTrends () {
       data: JSON.stringify({q: q}),
       contentType: "application/json",
       success: function(d){
-        setTimeout(function() {
-          console.log(d);
-        }, 2000);
         context.setState({
           twitterData: [{label: 'positive', score:d.positive},{label:'negative', score:d.negative}],
           twitterSpinner: false,
@@ -393,11 +383,12 @@ getTrends () {
       }
       map.updateChoropleth(obj);
     });
-    
+
     d3.select(window).on('resize', function() {
       map.resize();
     });
   }
+
 
   //***********************
   // NYTimes News Feed 

@@ -70,7 +70,14 @@ module.exports = {
 		// Promise function to get the 100 most recent Tweets from twitter
 		var callTwitter = function() {
 			return new Promise(function(resolve, reject) {	
-				grabTweets.get('search/tweets', {q: query, count: 100, result_type: 'recent', lang: 'en', result_type: 'recent', max_id: max_id}, function(error, tweets) {
+				grabTweets.get('search/tweets', {
+					q: query, 
+					count: 100, 
+					result_type: 'recent', 
+					lang: 'en', 
+					result_type: 'recent', 
+					max_id: max_id
+				}, function(error, tweets) {
 				  if (error) {
 				 		reject(error) 
 				  } else {

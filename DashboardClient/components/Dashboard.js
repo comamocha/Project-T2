@@ -393,7 +393,7 @@ getTrends () {
       }
       map.updateChoropleth(obj);
     });
-
+    
     d3.select(window).on('resize', function() {
       map.resize();
     });

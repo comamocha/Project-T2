@@ -14,6 +14,7 @@ import Loader from 'halogen/PulseLoader';
 import {Grid, Row, Col, Clearfix, Panel, Well, Button, Glyphicon} from 'react-bootstrap';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, Image, Jumbotron} from 'react-bootstrap';
 import {Router, Route, Link, hashHistory, IndexRoute} from 'react-router';
+//import request from 'request';
 
 var styles = {
   'background-color': 'black'
@@ -47,7 +48,7 @@ class Dashboard extends React.Component {
       facebookSpinner: false, //not likely to be needed
       twitterSummary: '',
       facebookSummary: '',
-      facebookTopHeadlines: '',
+      NewsTopHeadlines: '',
       facebookLikes: '',
       currentChart: 'twitterChart'
 
@@ -74,8 +75,9 @@ class Dashboard extends React.Component {
     if(this.state.currentChart === "twitterChart"){
       this.twitterGrab(e);
     } else {
-      this.facebookGrab(e);
+     // this.facebookGrab(e);
     }
+     this.updateNewsTopHeadlines(q);
     this.topTweetGrab(e);
   }
 
@@ -145,7 +147,7 @@ class Dashboard extends React.Component {
         context.setState({
           facebookData: fbdata,
           facebookSummary: d.summary,
-          facebookTopHeadlines: [d.topHeadline, d.secondHeadline],
+          NewsTopHeadlines: [d.topHeadline, d.secondHeadline],
           facebookLikes: d.likes
         });
         console.log(d.topHeadline);
@@ -190,6 +192,7 @@ class Dashboard extends React.Component {
     });
   }
 
+  //Updates all data. API calls for NewsFeed, Twitter are set here 
   allDataGrab (q) {
     //update everything (when new trend is selected)
     this.setState({
@@ -198,8 +201,9 @@ class Dashboard extends React.Component {
     if(this.state.currentChart === "twitterChart"){
       this.twitterGrab(q);
     } else {
-      this.facebookGrab(q);
+      //this.facebookGrab(q);
     }
+    this.updateNewsTopHeadlines(q);
     this.topTweetGrab(q);
   }
 
@@ -260,6 +264,51 @@ class Dashboard extends React.Component {
 
   worldMap() {
     var map = new Datamap({element: document.getElementById('worldMapContainer')});
+  }
+
+
+  //***********************
+  // NYTimes News Feed 
+  //************************
+  updateNewsTopHeadlines(keyword) {
+    var context = this;
+    console.log("updating news headlines.")
+    var url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+    url += '?' + $.param({
+      'api-key': "38618d65ade0456985ffee0915ba6299",
+      'q': keyword
+    });
+    $.ajax({
+      url: url,
+      method: 'GET',
+    }).done(function (result) {
+      
+      var finalbody = [];
+      //Go Through news articles and extract snippit
+      result.response.docs.map(function (article, index) {
+        //Snippet That is clickable 
+        //article
+        if(index < 2){
+          finalbody.push(
+            <a href={article.web_url}>
+            <div> 
+          {article.snippet} 
+          </div></a>)
+        }
+        
+        //callback(article.web_url, article.snippet)
+
+      })
+      context.setState({NewsTopHeadlines:  finalbody  });
+      //console.log(result);
+    }).fail(function (err) {
+      throw err;
+    });
+    
+
+  
+
+
   }
 
   updateDonutChart (dataset){
@@ -507,7 +556,7 @@ class Dashboard extends React.Component {
                 <TabPopularTweets info={this.state.trendHistory} header="MOST POPULAR TWEETS" sub1={this.state.representativeTweet1user} sub2={this.state.representativeTweet1headline} sub3={this.state.representativeTweet1time} sub4={this.state.representativeTweet2user} sub5={this.state.representativeTweet2headline} sub6={this.state.representativeTweet2time}/>
               </Row>
               <Row>
-                <TabNewsHeadlines info={this.state.trendHistory} header="MOST POPULAR HEADLINES" sub1={this.state.facebookTopHeadlines[0]} sub2={this.state.facebookTopHeadlines[1]}/>
+                <TabNewsHeadlines info={this.state.trendHistory} header="MOST POPULAR HEADLINES" sub1={this.state.NewsTopHeadlines[0]}  sub2={this.state.NewsTopHeadlines[1]} />
               </Row>
             </Col>
             <Col md={6} mdPull={6}>

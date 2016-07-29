@@ -24,9 +24,39 @@ class Dashboard extends React.Component {
   constructor(props){
     super(props);
     this.state = {
+      map: null,
+      countriesArr: [
+        ['Argentina', 'AR', 'ARG'],
+        ['Australia', 'AU', 'AUS'],
+        ['Austria', 'AT', 'AUT'],
+        ['Belgium', 'BE', 'BEL'],
+        ['Brazil', 'BR', 'BRA'],
+        ['Canada', 'CA', 'CAN'],
+        ['Chile', 'CL', 'CHL'],
+        ['Colombia', 'CO', 'COL'],
+        ['France', 'FR', 'FRA'],
+        ['Germany', 'DE', 'DEU'],
+        ['India', 'IN', 'IND'],
+        ['Italy', 'IT', 'ITA'],
+        ['Japan', 'JP', 'JPN'],
+        ['Malaysia', 'MY', 'MYS'],
+        ['Mexico', 'MX', 'MEX'],
+        ['Netherlands', 'NL', 'NLD'],
+        ['Norway', 'NO', 'NOR'],
+        ['Philippines', 'PH', 'PHL'],
+        ['Poland', 'PL', 'POL'],
+        ['Portugal', 'PT', 'PRT'],
+        ['Russia', 'RU', 'RUS'],
+        ['Sweden', 'SE', 'SWE'],
+        ['Switzerland', 'CH', 'CHE'],
+        ['Turkey', 'TR', 'TUR'],
+        ['United Kingdom', 'GB', 'GBR'],
+        ['United States', 'US', 'USA'],
+        ['Vietnam', 'VN', 'VNM']
+      ],
+      selectedCountry: 'US',
       searchedItem: '',
       trends: [],
-      historyArray: [],
       currentTrend: 'Select Trend',
       twitterData:[
         {label: 'positive', score: 50},
@@ -61,9 +91,48 @@ class Dashboard extends React.Component {
     this.getTrends();
     this.updateChart(this.state.twitterData, '#sentimentChart');
     this.worldMap();
-    // this.updateChart(this.state.twitterData, '#sentimentChart');
-    // this.updateDonutChart(this.state.facebookData);
-    // setInterval(this.getTrends.bind(this), 3000);
+    this.googleTrendGrab('US');
+  }
+
+  handleFormChange (e) {
+    var clickedCountry = e.target.value;
+    //Toggle former selected country's map color to default
+    this.toggleMapColors(clickedCountry);
+
+    //Change the selected country in state
+    this.setState({selectedCountry: e.target.value});
+
+    //Toggle new selected country's map color to default
+    //Uses setTimeout because the setState requires time to update
+    setTimeout(function() {this.toggleMapColors(clickedCountry)}.bind(this), 250);
+  }
+
+  toggleMapColors (clickedCountry) {
+    //Google's Trend API requires 2-digit country-codes
+    //Datamaps requires 3-digit country-codes
+    //For loop will find the corresponding 3-digit country-code for selected item
+    var countryCode = null;
+    for (var i = 0; i < this.state.countriesArr.length; i++) {
+      if (this.state.countriesArr[i][1] === this.state.selectedCountry) {
+        countryCode = this.state.countriesArr[i][2];
+      }
+    }
+
+    //Create the object to toggle map color 
+    var toggleVar = this.state.map.options.data[countryCode]['fillKey'] === 'SELECTED';
+    var fillKey = (toggleVar) ? 'UNSELECTED' : 'SELECTED';
+    var obj = {};
+    obj[countryCode] = {fillKey: fillKey};
+
+    //Update map color
+    this.state.map.updateChoropleth(obj);
+  }
+
+  googleTrendGrab (countryCode) {
+    console.log('googleTrendGrab countryCode is', countryCode);
+    $.get('http://localhost:3000/test', countryCode, function(list) {
+      document.getElementById('googleTrendGrabTarget').innerText = list;
+    });
   }
 
   searchTrend (e) {
@@ -71,7 +140,7 @@ class Dashboard extends React.Component {
     this.setState( {
       currentTrend: e
     })
-    this.getHistory(e);
+
     console.log(this.state.searchedItem);
     if(this.state.currentChart === "twitterChart"){
       this.twitterGrab(e);
@@ -82,25 +151,7 @@ class Dashboard extends React.Component {
     this.topTweetGrab(e);
   }
 
-  getHistory (q) {
-    var context = this;
-    $.ajax({
-      method: "POST",
-      url: 'http://localhost:3000/history',
-      data: JSON.stringify({q: q}),
-      contentType: "application/json",
-      success: function(d){
-        var history = d;
-        console.log(history, 'THIS IS ALL THE HISTORY DATA')
-        context.setState({
-          historyArray: history
-        })
-      },
-      dataType: 'json'
-    });
-  }
-
-getTrends () {
+  getTrends () {
     //pull in data from google trends to populate dropdown menu
     var context = this;
     $.get('http://localhost:3000/trends', function(data){
@@ -126,6 +177,9 @@ getTrends () {
       data: JSON.stringify({q: q}),
       contentType: "application/json",
       success: function(d){
+        setTimeout(function() {
+          console.log(d);
+        }, 2000);
         context.setState({
           twitterData: [{label: 'positive', score:d.positive},{label:'negative', score:d.negative}],
           twitterSpinner: false,
@@ -222,7 +276,6 @@ getTrends () {
     } else {
       //this.facebookGrab(q);
     }
-    this.getHistory(q);
     this.updateNewsTopHeadlines(q);
     this.topTweetGrab(q);
   }
@@ -283,9 +336,41 @@ getTrends () {
   }
 
   worldMap() {
-    var map = new Datamap({element: document.getElementById('worldMapContainer')});
-  }
+    this.state.map = new Datamap({
+      element: document.getElementById('worldMapContainer'),
+      responsive: true,
+      geographyConfig: {
+        popupOnHover: true,
+        popupTemplate: function(geography, data) { // This function should just return a string
+          // var lookup = googleTrendGrab(geography.properties.name);
+          return googleTrendGrab(geography.properties.name);
+        }
+      },
+      fills: {
+          SELECTED: 'red',
+          UNSELECTED: 'green',
+          defaultFill: 'gray'
+      }
+    })
 
+    var selectedCountry = this.state.selectedCountry;
+    var map = this.state.map;
+    this.state.countriesArr.map(function(triple) {
+      var obj = {}
+      if(triple[1] === selectedCountry) {
+        console.log('inside true')
+        obj[triple[2]] = {'fillKey': 'SELECTED'};
+      } else {
+        console.log('inside false')
+        obj[triple[2]] = {'fillKey': 'UNSELECTED'};
+      }
+      map.updateChoropleth(obj);
+    });
+
+    d3.select(window).on('resize', function() {
+      map.resize();
+    });
+  }
 
   //***********************
   // NYTimes News Feed 
@@ -450,79 +535,6 @@ getTrends () {
     }
   }
 
-
-  historyScale(b) {
-    // use d3 to create a line graph related to the trends of each month for the past year
-    // use scale.ticks(d3.time.month, 1) to have correct ticks on x axis
-    var dates = [];
-    for (var i = 0; i < this.state.historyArray.length; i++) {
-      dates.push(this.state.historyArray[i].keys());
-    }
-
-    var margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = 200 - margin.left - margin.right,
-    height = 150 - margin.top - margin.bottom;
-
-  var formatDate = d3.time.format("%B %Y");
-
-  var x = d3.time.scale()
-      .range([0, width]);
-
-  var y = d3.scale.linear()
-      .range([height, 0]);
-
-  var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
-
-  var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left");
-
-  var line = d3.svg.line()
-      .x(function(d) { console.log(d, 'IN THE DOT X FUNCTION FOR d');return x(d.date); })
-      .y(function(d) { return y(d.close); });
-
-  var svg = d3.select("body").append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  d3.tsv("data.tsv", type, function(error, data) {
-    if (error) throw error;
-
-    x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain(d3.extent(data, function(d) { return d.close; }));
-
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
-
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis)
-      .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Price ($)");
-
-    svg.append("path")
-        .datum(data)
-        .attr("class", "line")
-        .attr("d", line);
-  });
-
-  function type(d) {
-    d.date = formatDate.parse(d.date);
-    d.close = +d.close;
-    return d;
-  }
-}
-
   toggleChart () {
     var currentChart = d3.select('#sentimentChart').selectAll('svg');
     var currentChartClass = currentChart[0][0].className.animVal;
@@ -638,9 +650,9 @@ getTrends () {
           </Row>
           <Row>
 
-            <Col xs={6} md={4}><LeftTab info={this.state.trendHistory} header={this.state.currentTrend.toUpperCase()} sub={"Trend Score: " + Math.ceil(Math.random()  * 100)}/></Col>
+            <Col xs={6} md={4}><LeftTab info={this.state.trendHistory} header={this.state.currentTrend} sub={"Trend Score: " + Math.ceil(Math.random()  * 100)}/></Col>
             <Col xs={6} md={4}><MidTab loading={this.state.twitterSpinner} info={this.state.publicSentiment} header="PUBLIC SENTIMENT" sub={this.state.twitterSummary}/></Col>
-            <Col xs={6} md={4}><RightTab info={this.state.emotionalFeedback} header={"TREND OVER TIME (1 YEAR)"} sub={this.state.facebookSummary}/></Col>
+            <Col xs={6} md={4}><RightTab info={this.state.emotionalFeedback} header={"EMOTIONAL FEEDBACK"} sub={this.state.facebookSummary}/></Col>
           </Row>
           <Row>
             <Col md={6} mdPush={6}>
@@ -690,11 +702,20 @@ getTrends () {
           <Row>
             <div style={outline}>
               <h1 style={titular}>World Map</h1>
-              <div id="worldMapContainer" style={{width: 250 + 'px', height: 250 + 'px'}}></div>
+              <div id="worldMapContainer" style={{top: '-15%', height: '90%'}}></div>
+              <form onSubmit={this.googleTrendGrab(this.state.selectedCountry)}>
+                <p style={{color: 'white'}}>Select a country:</p>
+                <select id="countriesDropDown" name="Countries" value={this.state.selectedCountry}
+                  onChange={this.handleFormChange.bind(this)}>{
+                  this.state.countriesArr.map(function(tuple) {
+                    return <option value={tuple[1]}>{tuple[0]}</option>
+                  })
+                }</select>
+              </form>
             </div>
           </Row>
           <Row>
-
+            <div id='googleTrendGrabTarget' style={{color: 'white'}}></div>
           </Row>
       </Grid>
     );

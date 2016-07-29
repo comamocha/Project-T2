@@ -24,6 +24,8 @@ class Dashboard extends React.Component {
   constructor(props){
     super(props);
     this.state = {
+      countriesArr: null,
+      formValue: 'US',
       searchedItem: '',
       trends: [],
       currentTrend: 'Select Trend',
@@ -61,12 +63,19 @@ class Dashboard extends React.Component {
     this.updateChart(this.state.twitterData, '#sentimentChart');
     this.worldMap();
     this.googleTrendGrab('US');
-    // this.updateChart(this.state.twitterData, '#sentimentChart');
-    // this.updateDonutChart(this.state.facebookData);
-    // setInterval(this.getTrends.bind(this), 3000);
+  }
+
+  componentWillMount () {
+    this.setCountriesInState();
+  }
+
+  handleFormChange (e) {
+    console.log(e.target.value);
+    this.setState({formValue: e.target.value});
   }
 
   googleTrendGrab (countryCode) {
+    console.log('googleTrendGrab countryCode is', countryCode);
     $.get('http://localhost:3000/test', countryCode, function(list) {
       document.getElementById('googleTrendGrabTarget').innerText = list;
     });
@@ -275,7 +284,6 @@ class Dashboard extends React.Component {
   worldMap() {
     var map = new Datamap({
       element: document.getElementById('worldMapContainer'),
-      // scope: 'usa',
       responsive: true,
       geographyConfig: {
         popupOnHover: true,
@@ -299,6 +307,15 @@ class Dashboard extends React.Component {
     });
   }
 
+  setCountriesInState() {
+    var countries = Datamap.prototype.worldTopo.objects.world.geometries;
+    var countriesArr = [];
+    for (var i = 0; i < countries.length; i++) {
+      countriesArr.push([countries[i].properties.name, countries[i].id]);
+    }
+    this.setState({countriesArr: countriesArr});
+    this.updateCountriesOptions;
+  }
 
   //***********************
   // NYTimes News Feed 
@@ -631,8 +648,17 @@ class Dashboard extends React.Component {
             <div style={outline}>
               <h1 style={titular}>World Map</h1>
               <div id="worldMapContainer" style={{top: '-15%', height: '90%'}}></div>
-              <form>
-                
+              <form onSubmit={this.googleTrendGrab(this.state.formValue)}>
+                Select a country:
+                <select id="countriesDropDown" name="Countries" value={this.state.formValue}
+                  onChange={this.handleFormChange.bind(this)}>{
+                  this.state.countriesArr.map(function(tuple) {
+                    return <option value={tuple[0]}>{tuple[0]}</option>
+                  })
+                }</select>
+                <br></br>
+                <br></br>
+                <input type="submit"></input>
               </form>
             </div>
           </Row>

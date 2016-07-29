@@ -21106,14 +21106,6 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _Tab = __webpack_require__(175);
-
-	var _Tab2 = _interopRequireDefault(_Tab);
-
 	var _SearchComponent = __webpack_require__(440);
 
 	var _SearchComponent2 = _interopRequireDefault(_SearchComponent);
@@ -21175,6 +21167,7 @@
 	    _this.state = {
 	      searchedItem: '',
 	      trends: [],
+	      historyArray: [],
 	      currentTrend: 'Select Trend',
 	      twitterData: [{ label: 'positive', score: 50 }, { label: 'negative', score: 50 }],
 	      facebookData: [{ label: 'loves', score: 20 }, { label: 'wows', score: 20 }, { label: 'hahas', score: 20 }, { label: 'sads', score: 20 }, { label: 'angrys', score: 20 }],
@@ -21214,7 +21207,7 @@
 	      this.setState({
 	        currentTrend: e
 	      });
-
+	      this.getHistory(e);
 	      console.log(this.state.searchedItem);
 	      if (this.state.currentChart === "twitterChart") {
 	        this.twitterGrab(e);
@@ -21223,6 +21216,25 @@
 	      }
 	      this.updateNewsTopHeadlines(q);
 	      this.topTweetGrab(e);
+	    }
+	  }, {
+	    key: 'getHistory',
+	    value: function getHistory(q) {
+	      var context = this;
+	      $.ajax({
+	        method: "POST",
+	        url: 'http://localhost:3000/history',
+	        data: JSON.stringify({ q: q }),
+	        contentType: "application/json",
+	        success: function success(d) {
+	          var history = d;
+	          console.log(history, 'THIS IS ALL THE HISTORY DATA');
+	          context.setState({
+	            historyArray: history
+	          });
+	        },
+	        dataType: 'json'
+	      });
 	    }
 	  }, {
 	    key: 'getTrends',
@@ -21351,6 +21363,7 @@
 	      } else {
 	        //this.facebookGrab(q);
 	      }
+	      this.getHistory(q);
 	      this.updateNewsTopHeadlines(q);
 	      this.topTweetGrab(q);
 	    }
@@ -21424,10 +21437,10 @@
 	          //Snippet That is clickable 
 	          //article
 	          if (index < 2) {
-	            finalbody.push(_react2.default.createElement(
+	            finalbody.push(React.createElement(
 	              'a',
 	              { href: article.web_url },
-	              _react2.default.createElement(
+	              React.createElement(
 	                'div',
 	                null,
 	                article.snippet
@@ -21554,6 +21567,61 @@
 	      }
 	    }
 	  }, {
+	    key: 'historyScale',
+	    value: function historyScale(b) {
+	      // use d3 to create a line graph related to the trends of each month for the past year
+	      // use scale.ticks(d3.time.month, 1) to have correct ticks on x axis
+	      var dates = [];
+	      for (var i = 0; i < this.state.historyArray.length; i++) {
+	        dates.push(this.state.historyArray[i].keys());
+	      }
+
+	      var margin = { top: 20, right: 20, bottom: 30, left: 50 },
+	          width = 200 - margin.left - margin.right,
+	          height = 150 - margin.top - margin.bottom;
+
+	      var formatDate = d3.time.format("%B %Y");
+
+	      var x = d3.time.scale().range([0, width]);
+
+	      var y = d3.scale.linear().range([height, 0]);
+
+	      var xAxis = d3.svg.axis().scale(x).orient("bottom");
+
+	      var yAxis = d3.svg.axis().scale(y).orient("left");
+
+	      var line = d3.svg.line().x(function (d) {
+	        console.log(d, 'IN THE DOT X FUNCTION FOR d');return x(d.date);
+	      }).y(function (d) {
+	        return y(d.close);
+	      });
+
+	      var svg = d3.select("body").append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	      d3.tsv("data.tsv", type, function (error, data) {
+	        if (error) throw error;
+
+	        x.domain(d3.extent(data, function (d) {
+	          return d.date;
+	        }));
+	        y.domain(d3.extent(data, function (d) {
+	          return d.close;
+	        }));
+
+	        svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
+
+	        svg.append("g").attr("class", "y axis").call(yAxis).append("text").attr("transform", "rotate(-90)").attr("y", 6).attr("dy", ".71em").style("text-anchor", "end").text("Price ($)");
+
+	        svg.append("path").datum(data).attr("class", "line").attr("d", line);
+	      });
+
+	      function type(d) {
+	        d.date = formatDate.parse(d.date);
+	        d.close = +d.close;
+	        return d;
+	      }
+	    }
+	  }, {
 	    key: 'toggleChart',
 	    value: function toggleChart() {
 	      var currentChart = d3.select('#sentimentChart').selectAll('svg');
@@ -21638,211 +21706,211 @@
 	      // }
 
 
-	      return _react2.default.createElement(
+	      return React.createElement(
 	        _reactBootstrap.Grid,
 	        null,
-	        _react2.default.createElement(
+	        React.createElement(
 	          _reactBootstrap.Row,
 	          null,
-	          _react2.default.createElement(
+	          React.createElement(
 	            _reactBootstrap.Navbar,
 	            { style: header },
-	            _react2.default.createElement(
+	            React.createElement(
 	              _reactBootstrap.Navbar.Header,
 	              null,
-	              _react2.default.createElement(
+	              React.createElement(
 	                _reactBootstrap.Navbar.Brand,
 	                { style: headerli },
-	                _react2.default.createElement(
+	                React.createElement(
 	                  'a',
 	                  { href: '#' },
-	                  _react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'signal', style: glyphOffset }),
+	                  React.createElement(_reactBootstrap.Glyphicon, { glyph: 'signal', style: glyphOffset }),
 	                  'Trend Wave'
 	                )
 	              )
 	            ),
-	            _react2.default.createElement(
+	            React.createElement(
 	              _reactBootstrap.Nav,
 	              { style: headerli },
-	              _react2.default.createElement(
+	              React.createElement(
 	                _reactBootstrap.NavDropdown,
 	                { style: liColor, eventKey: 1, title: 'Current Trends', id: 'basic-nav-dropdown' },
-	                _react2.default.createElement(
+	                React.createElement(
 	                  _reactBootstrap.MenuItem,
 	                  { style: liColor, eventKey: 1.1 },
 	                  'Select Trend'
 	                ),
-	                _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-	                _react2.default.createElement(_reactBootstrap.MenuItem, null),
+	                React.createElement(_reactBootstrap.MenuItem, { divider: true }),
+	                React.createElement(_reactBootstrap.MenuItem, null),
 	                this.state.trends.map(function (trend, index) {
 	                  var eKey = Number('1.' + (index + 1));
 	                  var context = this;
 	                  var handler = function handler() {
 	                    context.allDataGrab(trend);
 	                  };
-	                  return _react2.default.createElement(
+	                  return React.createElement(
 	                    _reactBootstrap.MenuItem,
 	                    { eventKey: eKey, key: index, onClick: handler },
 	                    trend
 	                  );
 	                }.bind(this))
 	              ),
-	              _react2.default.createElement(
+	              React.createElement(
 	                _reactBootstrap.Button,
 	                { onClick: this.toggleChart.bind(this) },
 	                'Toggle Display'
 	              )
 	            ),
-	            _react2.default.createElement(_SearchComponent2.default, { search: this.searchTrend.bind(this) })
+	            React.createElement(_SearchComponent2.default, { search: this.searchTrend.bind(this) })
 	          )
 	        ),
-	        _react2.default.createElement(
+	        React.createElement(
 	          _reactBootstrap.Row,
 	          null,
-	          _react2.default.createElement(
+	          React.createElement(
 	            _reactBootstrap.Col,
 	            { xs: 6, md: 4 },
-	            _react2.default.createElement(_leftTab2.default, { info: this.state.trendHistory, header: this.state.currentTrend, sub: "Trend Score: " + Math.ceil(Math.random() * 100) })
+	            React.createElement(_leftTab2.default, { info: this.state.trendHistory, header: this.state.currentTrend.toUpperCase(), sub: "Trend Score: " + Math.ceil(Math.random() * 100) })
 	          ),
-	          _react2.default.createElement(
+	          React.createElement(
 	            _reactBootstrap.Col,
 	            { xs: 6, md: 4 },
-	            _react2.default.createElement(_MidTab2.default, { loading: this.state.twitterSpinner, info: this.state.publicSentiment, header: 'PUBLIC SENTIMENT', sub: this.state.twitterSummary })
+	            React.createElement(_MidTab2.default, { loading: this.state.twitterSpinner, info: this.state.publicSentiment, header: 'PUBLIC SENTIMENT', sub: this.state.twitterSummary })
 	          ),
-	          _react2.default.createElement(
+	          React.createElement(
 	            _reactBootstrap.Col,
 	            { xs: 6, md: 4 },
-	            _react2.default.createElement(_RightTab2.default, { info: this.state.emotionalFeedback, header: "EMOTIONAL FEEDBACK", sub: this.state.facebookSummary })
+	            React.createElement(_RightTab2.default, { info: this.state.emotionalFeedback, header: "TREND OVER TIME (1 YEAR)", sub: this.state.facebookSummary })
 	          )
 	        ),
-	        _react2.default.createElement(
+	        React.createElement(
 	          _reactBootstrap.Row,
 	          null,
-	          _react2.default.createElement(
+	          React.createElement(
 	            _reactBootstrap.Col,
 	            { md: 6, mdPush: 6 },
-	            _react2.default.createElement(
+	            React.createElement(
 	              _reactBootstrap.Row,
 	              null,
-	              _react2.default.createElement(_TabPopularTweets2.default, { info: this.state.trendHistory, header: 'MOST POPULAR TWEETS', sub1: this.state.representativeTweet1user, sub2: this.state.representativeTweet1headline, sub3: this.state.representativeTweet1time, sub4: this.state.representativeTweet2user, sub5: this.state.representativeTweet2headline, sub6: this.state.representativeTweet2time })
+	              React.createElement(_TabPopularTweets2.default, { info: this.state.trendHistory, header: 'MOST POPULAR TWEETS', sub1: this.state.representativeTweet1user, sub2: this.state.representativeTweet1headline, sub3: this.state.representativeTweet1time, sub4: this.state.representativeTweet2user, sub5: this.state.representativeTweet2headline, sub6: this.state.representativeTweet2time })
 	            ),
-	            _react2.default.createElement(
+	            React.createElement(
 	              _reactBootstrap.Row,
 	              null,
-	              _react2.default.createElement(_TabNewsHeadlines2.default, { info: this.state.trendHistory, header: 'MOST POPULAR HEADLINES', sub1: this.state.NewsTopHeadlines[0], sub2: this.state.NewsTopHeadlines[1] })
+	              React.createElement(_TabNewsHeadlines2.default, { info: this.state.trendHistory, header: 'MOST POPULAR HEADLINES', sub1: this.state.NewsTopHeadlines[0], sub2: this.state.NewsTopHeadlines[1] })
 	            )
 	          ),
-	          _react2.default.createElement(
+	          React.createElement(
 	            _reactBootstrap.Col,
 	            { md: 6, mdPull: 6 },
-	            _react2.default.createElement(
+	            React.createElement(
 	              'div',
 	              { style: outline },
-	              _react2.default.createElement(
+	              React.createElement(
 	                'h1',
 	                { style: titular },
 	                'SENTIMENT ANALYSIS'
 	              ),
-	              _react2.default.createElement(
+	              React.createElement(
 	                'div',
 	                { id: 'sentimentChart', style: sentimentChart },
-	                this.state.twitterSpinner ? _react2.default.createElement(_PulseLoader2.default, { color: '#26A65B ', size: '16px', margin: '4px' }) : _react2.default.createElement('div', null)
+	                this.state.twitterSpinner ? React.createElement(_PulseLoader2.default, { color: '#26A65B ', size: '16px', margin: '4px' }) : React.createElement('div', null)
 	              ),
-	              this.state.currentChart == 'facebookChart' ? _react2.default.createElement(
+	              this.state.currentChart == 'facebookChart' ? React.createElement(
 	                'div',
 	                null,
-	                _react2.default.createElement(
+	                React.createElement(
 	                  'ul',
 	                  { className: 'legend horizontal-list' },
-	                  _react2.default.createElement(
+	                  React.createElement(
 	                    'li',
 	                    null,
-	                    _react2.default.createElement(
+	                    React.createElement(
 	                      'p',
 	                      { className: 'love split scnd-font-color' },
 	                      'Love'
 	                    ),
-	                    _react2.default.createElement(
+	                    React.createElement(
 	                      'p',
 	                      { className: 'percentage' },
 	                      'N/A',
-	                      _react2.default.createElement(
+	                      React.createElement(
 	                        'sup',
 	                        null,
 	                        '%'
 	                      )
 	                    )
 	                  ),
-	                  _react2.default.createElement(
+	                  React.createElement(
 	                    'li',
 	                    null,
-	                    _react2.default.createElement(
+	                    React.createElement(
 	                      'p',
 	                      { className: 'shocked split scnd-font-color' },
 	                      'Shocked'
 	                    ),
-	                    _react2.default.createElement(
+	                    React.createElement(
 	                      'p',
 	                      { className: 'percentage' },
 	                      'N/A',
-	                      _react2.default.createElement(
+	                      React.createElement(
 	                        'sup',
 	                        null,
 	                        '%'
 	                      )
 	                    )
 	                  ),
-	                  _react2.default.createElement(
+	                  React.createElement(
 	                    'li',
 	                    null,
-	                    _react2.default.createElement(
+	                    React.createElement(
 	                      'p',
 	                      { className: 'funny split scnd-font-color' },
 	                      'Funny'
 	                    ),
-	                    _react2.default.createElement(
+	                    React.createElement(
 	                      'p',
 	                      { className: 'percentage' },
 	                      'N/A',
-	                      _react2.default.createElement(
+	                      React.createElement(
 	                        'sup',
 	                        null,
 	                        '%'
 	                      )
 	                    )
 	                  ),
-	                  _react2.default.createElement(
+	                  React.createElement(
 	                    'li',
 	                    null,
-	                    _react2.default.createElement(
+	                    React.createElement(
 	                      'p',
 	                      { className: 'sad split scnd-font-color' },
 	                      'Sad'
 	                    ),
-	                    _react2.default.createElement(
+	                    React.createElement(
 	                      'p',
 	                      { className: 'percentage' },
 	                      'N/A',
-	                      _react2.default.createElement(
+	                      React.createElement(
 	                        'sup',
 	                        null,
 	                        '%'
 	                      )
 	                    )
 	                  ),
-	                  _react2.default.createElement(
+	                  React.createElement(
 	                    'li',
 	                    null,
-	                    _react2.default.createElement(
+	                    React.createElement(
 	                      'p',
 	                      { className: 'angry split scnd-font-color' },
 	                      'Angry'
 	                    ),
-	                    _react2.default.createElement(
+	                    React.createElement(
 	                      'p',
 	                      { className: 'percentage' },
 	                      'N/A',
-	                      _react2.default.createElement(
+	                      React.createElement(
 	                        'sup',
 	                        null,
 	                        '%'
@@ -21854,27 +21922,27 @@
 	            )
 	          )
 	        ),
-	        _react2.default.createElement(
+	        React.createElement(
 	          _reactBootstrap.Row,
 	          null,
-	          _react2.default.createElement(
+	          React.createElement(
 	            'div',
 	            { style: outline },
-	            _react2.default.createElement(
+	            React.createElement(
 	              'h1',
 	              { style: titular },
 	              'World Map'
 	            ),
-	            _react2.default.createElement('div', { id: 'worldMapContainer', style: { width: 250 + 'px', height: 250 + 'px' } })
+	            React.createElement('div', { id: 'worldMapContainer', style: { width: 250 + 'px', height: 250 + 'px' } })
 	          )
 	        ),
-	        _react2.default.createElement(_reactBootstrap.Row, null)
+	        React.createElement(_reactBootstrap.Row, null)
 	      );
 	    }
 	  }]);
 
 	  return Dashboard;
-	}(_react2.default.Component);
+	}(React.Component);
 
 	exports.default = Dashboard;
 
@@ -41528,83 +41596,7 @@
 	}();
 
 /***/ },
-/* 175 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-			value: true
-	});
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactBootstrap = __webpack_require__(176);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var container = {
-			'height': '150px',
-			'float': 'left',
-
-			'width': '100%'
-
-	};
-
-	var menuBox = {
-			'height': '150px',
-			'margin-bottom': '25px',
-			'background': '#394264',
-			'border-radius': '5px'
-	};
-
-	var titular = {
-			'display': 'block',
-			'line-height': '50px',
-			'margin': '0',
-			'text-align': 'center',
-			'border-top-left-radius': '5px',
-			'border-top-right-radius': '5px',
-			'font-size': '17px',
-			'color': '#fff',
-			'background': '#11a8ab',
-			'font-weight': 'bold'
-
-	};
-
-	var boxText = {
-			'text-align': 'center',
-			'font-size': '30px',
-			'color': 'white',
-			'margin-top': '25px'
-	};
-
-	var Tab = function Tab(props) {
-			return _react2.default.createElement(
-					'div',
-					{ style: container },
-					_react2.default.createElement(
-							'div',
-							{ style: menuBox },
-							_react2.default.createElement(
-									'h2',
-									{ style: titular },
-									props.header
-							),
-							_react2.default.createElement(
-									'p',
-									{ style: boxText },
-									props.sub
-							)
-					)
-			);
-	};
-
-	exports.default = Tab;
-
-/***/ },
+/* 175 */,
 /* 176 */
 /***/ function(module, exports, __webpack_require__) {
 

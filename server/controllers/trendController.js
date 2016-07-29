@@ -13,5 +13,18 @@ module.exports = {
 		.catch(function(err){
 			console.log(err);
 		})
+	},
+
+	trendHistory: function(req, res, next) {
+		// Return the hisorical data from search
+		googleTrends.trendData(req.body.q)
+		.then(function(data) {
+			var chunk = data[0].splice(data.length-13, 13);
+			res.send(chunk);
+		})
+		.catch(function(err) {
+			console.log(err);
+	})
 	}
+
 }

@@ -1,5 +1,3 @@
-import React from 'react';
-import Tab from './Tab';
 import Search from './SearchComponent';
 
 import LeftTab from './leftTab';
@@ -14,6 +12,7 @@ import Loader from 'halogen/PulseLoader';
 import {Grid, Row, Col, Clearfix, Panel, Well, Button, Glyphicon} from 'react-bootstrap';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, Image, Jumbotron} from 'react-bootstrap';
 import {Router, Route, Link, hashHistory, IndexRoute} from 'react-router';
+//import request from 'request';
 
 var styles = {
   'background-color': 'black'
@@ -48,7 +47,7 @@ class Dashboard extends React.Component {
       facebookSpinner: false, //not likely to be needed
       twitterSummary: '',
       facebookSummary: '',
-      facebookTopHeadlines: '',
+      NewsTopHeadlines: '',
       facebookLikes: '',
       currentChart: 'twitterChart'
 
@@ -75,8 +74,9 @@ class Dashboard extends React.Component {
     if(this.state.currentChart === "twitterChart"){
       this.twitterGrab(e);
     } else {
-      this.facebookGrab(e);
+     // this.facebookGrab(e);
     }
+     this.updateNewsTopHeadlines(q);
     this.topTweetGrab(e);
   }
 
@@ -98,7 +98,7 @@ class Dashboard extends React.Component {
     });
   }
 
-  getTrends () {
+getTrends () {
     //pull in data from google trends to populate dropdown menu
     var context = this;
     $.get('http://localhost:3000/trends', function(data){
@@ -164,7 +164,7 @@ class Dashboard extends React.Component {
         context.setState({
           facebookData: fbdata,
           facebookSummary: d.summary,
-          facebookTopHeadlines: [d.topHeadline, d.secondHeadline],
+          NewsTopHeadlines: [d.topHeadline, d.secondHeadline],
           facebookLikes: d.likes
         });
         console.log(d.topHeadline);
@@ -209,6 +209,7 @@ class Dashboard extends React.Component {
     });
   }
 
+  //Updates all data. API calls for NewsFeed, Twitter are set here 
   allDataGrab (q) {
     //update everything (when new trend is selected)
     this.setState({
@@ -217,9 +218,10 @@ class Dashboard extends React.Component {
     if(this.state.currentChart === "twitterChart"){
       this.twitterGrab(q);
     } else {
-      this.facebookGrab(q);
+      //this.facebookGrab(q);
     }
     this.getHistory(q);
+    this.updateNewsTopHeadlines(q);
     this.topTweetGrab(q);
   }
 
@@ -280,6 +282,51 @@ class Dashboard extends React.Component {
 
   worldMap() {
     var map = new Datamap({element: document.getElementById('worldMapContainer')});
+  }
+
+
+  //***********************
+  // NYTimes News Feed 
+  //************************
+  updateNewsTopHeadlines(keyword) {
+    var context = this;
+    console.log("updating news headlines.")
+    var url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+    url += '?' + $.param({
+      'api-key': "38618d65ade0456985ffee0915ba6299",
+      'q': keyword
+    });
+    $.ajax({
+      url: url,
+      method: 'GET',
+    }).done(function (result) {
+      
+      var finalbody = [];
+      //Go Through news articles and extract snippit
+      result.response.docs.map(function (article, index) {
+        //Snippet That is clickable 
+        //article
+        if(index < 2){
+          finalbody.push(
+            <a href={article.web_url}>
+            <div> 
+          {article.snippet} 
+          </div></a>)
+        }
+        
+        //callback(article.web_url, article.snippet)
+
+      })
+      context.setState({NewsTopHeadlines:  finalbody  });
+      //console.log(result);
+    }).fail(function (err) {
+      throw err;
+    });
+    
+
+  
+
+
   }
 
   updateDonutChart (dataset){
@@ -399,8 +446,8 @@ class Dashboard extends React.Component {
         return function(t) { return arc(i(t)); };
       };
     }
-
   }
+
 
   historyScale(b) {
     // use d3 to create a line graph related to the trends of each month for the past year
@@ -414,65 +461,65 @@ class Dashboard extends React.Component {
     width = 200 - margin.left - margin.right,
     height = 150 - margin.top - margin.bottom;
 
-var formatDate = d3.time.format("%B %Y");
+  var formatDate = d3.time.format("%B %Y");
 
-var x = d3.time.scale()
-    .range([0, width]);
+  var x = d3.time.scale()
+      .range([0, width]);
 
-var y = d3.scale.linear()
-    .range([height, 0]);
+  var y = d3.scale.linear()
+      .range([height, 0]);
 
-var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom");
+  var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom");
 
-var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left");
+  var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left");
 
-var line = d3.svg.line()
-    .x(function(d) { console.log(d, 'IN THE DOT X FUNCTION FOR d');return x(d.date); })
-    .y(function(d) { return y(d.close); });
+  var line = d3.svg.line()
+      .x(function(d) { console.log(d, 'IN THE DOT X FUNCTION FOR d');return x(d.date); })
+      .y(function(d) { return y(d.close); });
 
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.tsv("data.tsv", type, function(error, data) {
-  if (error) throw error;
+  d3.tsv("data.tsv", type, function(error, data) {
+    if (error) throw error;
 
-  x.domain(d3.extent(data, function(d) { return d.date; }));
-  y.domain(d3.extent(data, function(d) { return d.close; }));
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain(d3.extent(data, function(d) { return d.close; }));
 
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
 
-  svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Price ($)");
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+      .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Price ($)");
 
-  svg.append("path")
-      .datum(data)
-      .attr("class", "line")
-      .attr("d", line);
-});
+    svg.append("path")
+        .datum(data)
+        .attr("class", "line")
+        .attr("d", line);
+  });
 
-function type(d) {
-  d.date = formatDate.parse(d.date);
-  d.close = +d.close;
-  return d;
-}
+  function type(d) {
+    d.date = formatDate.parse(d.date);
+    d.close = +d.close;
+    return d;
   }
+}
 
   toggleChart () {
     var currentChart = d3.select('#sentimentChart').selectAll('svg');
@@ -600,7 +647,7 @@ function type(d) {
                 <TabPopularTweets info={this.state.trendHistory} header="MOST POPULAR TWEETS" sub1={this.state.representativeTweet1user} sub2={this.state.representativeTweet1headline} sub3={this.state.representativeTweet1time} sub4={this.state.representativeTweet2user} sub5={this.state.representativeTweet2headline} sub6={this.state.representativeTweet2time}/>
               </Row>
               <Row>
-                <TabNewsHeadlines info={this.state.trendHistory} header="MOST POPULAR HEADLINES" sub1={this.state.facebookTopHeadlines[0]} sub2={this.state.facebookTopHeadlines[1]}/>
+                <TabNewsHeadlines info={this.state.trendHistory} header="MOST POPULAR HEADLINES" sub1={this.state.NewsTopHeadlines[0]}  sub2={this.state.NewsTopHeadlines[1]} />
               </Row>
             </Col>
             <Col md={6} mdPull={6}>

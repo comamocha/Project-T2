@@ -24,8 +24,37 @@ class Dashboard extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      countriesArr: null,
-      formValue: 'US',
+      map: null,
+      countriesArr: [
+        ['Argentina', 'AR', 'ARG'],
+        ['Australia', 'AU', 'AUS'],
+        ['Austria', 'AT', 'AUT'],
+        ['Belgium', 'BE', 'BEL'],
+        ['Brazil', 'BR', 'BRA'],
+        ['Canada', 'CA', 'CAN'],
+        ['Chile', 'CL', 'CHL'],
+        ['Colombia', 'CO', 'COL'],
+        ['France', 'FR', 'FRA'],
+        ['Germany', 'DE', 'DEU'],
+        ['India', 'IN', 'IND'],
+        ['Italy', 'IT', 'ITA'],
+        ['Japan', 'JP', 'JPN'],
+        ['Malaysia', 'MY', 'MYS'],
+        ['Mexico', 'MX', 'MEX'],
+        ['Netherlands', 'NL', 'NLD'],
+        ['Norway', 'NO', 'NOR'],
+        ['Philippines', 'PH', 'PHL'],
+        ['Poland', 'PL', 'POL'],
+        ['Portugal', 'PT', 'PRT'],
+        ['Russia', 'RU', 'RUS'],
+        ['Sweden', 'SE', 'SWE'],
+        ['Switzerland', 'CH', 'CHE'],
+        ['Turkey', 'TR', 'TUR'],
+        ['United Kingdom', 'GB', 'GBR'],
+        ['United States', 'US', 'USA'],
+        ['Vietnam', 'VN', 'VNM']
+      ],
+      selectedCountry: 'US',
       searchedItem: '',
       trends: [],
       currentTrend: 'Select Trend',
@@ -65,13 +94,38 @@ class Dashboard extends React.Component {
     this.googleTrendGrab('US');
   }
 
-  componentWillMount () {
-    this.setCountriesInState();
+  handleFormChange (e) {
+    var clickedCountry = e.target.value;
+    //Toggle former selected country's map color to default
+    this.toggleMapColors(clickedCountry);
+
+    //Change the selected country in state
+    this.setState({selectedCountry: e.target.value});
+
+    //Toggle new selected country's map color to default
+    //Uses setTimeout because the setState requires time to update
+    setTimeout(function() {this.toggleMapColors(clickedCountry)}.bind(this), 250);
   }
 
-  handleFormChange (e) {
-    console.log(e.target.value);
-    this.setState({formValue: e.target.value});
+  toggleMapColors (clickedCountry) {
+    //Google's Trend API requires 2-digit country-codes
+    //Datamaps requires 3-digit country-codes
+    //For loop will find the corresponding 3-digit country-code for selected item
+    var countryCode = null;
+    for (var i = 0; i < this.state.countriesArr.length; i++) {
+      if (this.state.countriesArr[i][1] === this.state.selectedCountry) {
+        countryCode = this.state.countriesArr[i][2];
+      }
+    }
+
+    //Create the object to toggle map color 
+    var toggleVar = this.state.map.options.data[countryCode]['fillKey'] === 'SELECTED';
+    var fillKey = (toggleVar) ? 'UNSELECTED' : 'SELECTED';
+    var obj = {};
+    obj[countryCode] = {fillKey: fillKey};
+
+    //Update map color
+    this.state.map.updateChoropleth(obj);
   }
 
   googleTrendGrab (countryCode) {
@@ -282,7 +336,7 @@ class Dashboard extends React.Component {
   }
 
   worldMap() {
-    var map = new Datamap({
+    this.state.map = new Datamap({
       element: document.getElementById('worldMapContainer'),
       responsive: true,
       geographyConfig: {
@@ -293,28 +347,29 @@ class Dashboard extends React.Component {
         }
       },
       fills: {
-          HIGH: '#afafaf',
-          LOW: '#123456',
-          MEDIUM: 'blue',
-          UNKNOWN: 'rgb(0,0,0)',
-          defaultFill: 'green'
+          SELECTED: 'red',
+          UNSELECTED: 'green',
+          defaultFill: 'gray'
       }
+    })
 
+    var selectedCountry = this.state.selectedCountry;
+    var map = this.state.map;
+    this.state.countriesArr.map(function(triple) {
+      var obj = {}
+      if(triple[1] === selectedCountry) {
+        console.log('inside true')
+        obj[triple[2]] = {'fillKey': 'SELECTED'};
+      } else {
+        console.log('inside false')
+        obj[triple[2]] = {'fillKey': 'UNSELECTED'};
+      }
+      map.updateChoropleth(obj);
     });
 
     d3.select(window).on('resize', function() {
       map.resize();
     });
-  }
-
-  setCountriesInState() {
-    var countries = Datamap.prototype.worldTopo.objects.world.geometries;
-    var countriesArr = [];
-    for (var i = 0; i < countries.length; i++) {
-      countriesArr.push([countries[i].properties.name, countries[i].id]);
-    }
-    this.setState({countriesArr: countriesArr});
-    this.updateCountriesOptions;
   }
 
   //***********************
@@ -648,17 +703,14 @@ class Dashboard extends React.Component {
             <div style={outline}>
               <h1 style={titular}>World Map</h1>
               <div id="worldMapContainer" style={{top: '-15%', height: '90%'}}></div>
-              <form onSubmit={this.googleTrendGrab(this.state.formValue)}>
-                Select a country:
-                <select id="countriesDropDown" name="Countries" value={this.state.formValue}
+              <form onSubmit={this.googleTrendGrab(this.state.selectedCountry)}>
+                <p style={{color: 'white'}}>Select a country:</p>
+                <select id="countriesDropDown" name="Countries" value={this.state.selectedCountry}
                   onChange={this.handleFormChange.bind(this)}>{
                   this.state.countriesArr.map(function(tuple) {
-                    return <option value={tuple[0]}>{tuple[0]}</option>
+                    return <option value={tuple[1]}>{tuple[0]}</option>
                   })
                 }</select>
-                <br></br>
-                <br></br>
-                <input type="submit"></input>
               </form>
             </div>
           </Row>

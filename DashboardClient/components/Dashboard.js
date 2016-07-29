@@ -399,16 +399,6 @@ getTrends () {
     });
   }
 
-  setCountriesInState() {
-    var countries = Datamap.prototype.worldTopo.objects.world.geometries;
-    var countriesArr = [];
-    for (var i = 0; i < countries.length; i++) {
-      countriesArr.push([countries[i].properties.name, countries[i].id]);
-    }
-    this.setState({countriesArr: countriesArr});
-    this.updateCountriesOptions;
-  }
-
   //***********************
   // NYTimes News Feed 
   //************************

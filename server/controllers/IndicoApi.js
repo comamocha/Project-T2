@@ -28,6 +28,7 @@ module.exports = {
 			indico.political(string, function (err, response) {
 				if (err) {
 					reject(err);
+					console.log("pointless code")
 				} else {
 					resolve(response)
 				}

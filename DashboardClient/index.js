@@ -61679,7 +61679,10 @@
 	  'height': '235px',
 	  'float': 'left',
 	  'width': '100%',
-	  'padding-left': '27.5px'
+	  'padding-left': '27.5px',
+	  'overflow': 'hidden',
+	  'text-overflow': 'ellipsis'
+
 	};
 
 	var menuBox = {
@@ -61703,7 +61706,7 @@
 
 	var boxText = {
 	  'text-align': 'left',
-	  'color': 'white',
+	  'color': 'blue',
 	  'margin-left': '40px',
 	  'margin-right': '40px'
 	};
@@ -61726,12 +61729,13 @@
 	        props.header
 	      ),
 	      _react2.default.createElement(
-	        'p',
+	        'div',
 	        { style: boxText },
 	        props.sub1
 	      ),
+	      '  ',
 	      _react2.default.createElement(
-	        'p',
+	        'div',
 	        { style: boxText },
 	        props.sub2
 	      )

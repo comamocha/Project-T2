@@ -77,6 +77,7 @@ module.exports = {
 				  	resolve(
 					   	tweets.statuses.forEach(function(tweetObj, index) {
 					   		counter++
+					   		//console.log(tweetObj.user.location)
 					      tweetString += tweetObj.text
 					      .replace(/(?:https?|ftp):\/\/[\n\S]+/g, '')
 					      .replace(/[`❤️~@#$%^&*()_|☆+\-=;:<>\{\}\[\]\\\/]/gi, ' ')
@@ -97,6 +98,25 @@ module.exports = {
 						callTwitter().then(function() {
 
 							// Send the tweets to Watson for analysis
+							var storage = {}
+
+							tweetString.split(/[\s,.!?]+/).map(function(string) {
+								if (string.length > 3) {
+									var lString = string.toLowerCase()
+									if (storage[lString]) {
+										storage[lString] += 1													
+									} else {
+										storage[lString] = 1
+									}
+								}
+							})
+
+							for(var key in storage) {
+								if (storage[key] < 5) {
+									delete storage[key]
+								}
+							}
+						
 							getSentiment({text: tweetString}).then(function(data) {
 								
 								var positive = 0;

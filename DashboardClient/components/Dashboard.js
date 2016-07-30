@@ -155,6 +155,10 @@ class Dashboard extends React.Component {
     });
   }
 
+/**************************
+ * End Map Component Logic
+ **************************/
+
   searchTrend (e) {
     this.setState( {
       currentTrend: e
@@ -177,6 +181,15 @@ getObjectValues(obj) {
   return values;
 }
 
+  setHistoryDataPoints(array) {
+    var dataPointsForGraph = [];
+    for (var i = 1; i < array.length; i++) {
+      dataPointsForGraph.push({'x': i, 'y': Number(this.getObjectValues(array[i])[0])})
+      console.log(dataPointsForGraph)
+    }
+    return dataPointsForGraph;
+  }
+
   getHistory (q) {
     var context = this;
     $.ajax({
@@ -186,10 +199,12 @@ getObjectValues(obj) {
       contentType: "application/json",
       success: function(d){
         var history = d;
+        var dataPoints = context.setHistoryDataPoints(history);
         console.log(history, 'THIS IS ALL THE HISTORY DATA')
         context.setState({
           historyArray: history,
-          trendScore: context.getObjectValues(history[history.length-1])[0]
+          trendScore: context.getObjectValues(history[history.length-1])[0],
+          historicalTrendArray: dataPoints
         })
       },
       dataType: 'json'
@@ -277,9 +292,11 @@ getTrends () {
     } else {
       //this.facebookGrab(q);
     }
+    this.getHistory(q);
     this.updateNewsTopHeadlines(q);
     this.topTweetGrab(q);
   }
+
 
   updateChart (data, id) {
     var width = 350, //960
@@ -485,7 +502,7 @@ getTrends () {
           <Row>
             <Col xs={6} md={4}><LeftTab info={this.state.trendHistory} header={this.state.currentTrend.toUpperCase()} sub={"Trend Score: " + this.state.trendScore}/></Col>
             <Col xs={6} md={4}><MidTab loading={this.state.twitterSpinner} info={this.state.publicSentiment} header="PUBLIC SENTIMENT" sub={this.state.twitterSummary}/></Col>
-            <Col xs={6} md={4}><RightTab info={this.state.emotionalFeedback} header={"EMOTIONAL FEEDBACK"} sub={this.state.facebookSummary}/></Col>
+            <Col xs={6} md={4}><RightTab id='visualisation' header={"TREND GRAPH (1 YEAR)"} sub={'graph'} plotPoints={this.state.historicalTrendArray}/></Col>
           </Row>
           <Row>
             <Col md={6} mdPush={6}>

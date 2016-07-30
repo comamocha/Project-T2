@@ -49,6 +49,7 @@ function updateDonutChart (dataset){
     .attr("fill", function(d, i) { return color(i); })
     .attr("d", arc);
 
+
   transition(1);
 
   function arcs(data0, data1) {

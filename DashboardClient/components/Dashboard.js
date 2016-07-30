@@ -4,6 +4,8 @@ import Loader from 'halogen/PulseLoader';
 import {Grid, Row, Col, Clearfix, Panel, Well, Button, Glyphicon} from 'react-bootstrap';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, Image, Jumbotron} from 'react-bootstrap';
 import {Router, Route, Link, hashHistory, IndexRoute} from 'react-router';
+import updateDonutChart from './D3.js';
+import toggleComponent from './ToggleComponent'
 
 import LeftTab from './leftTab';
 import WorldMap from  './DashboardComponents/map/WorldMap';
@@ -29,12 +31,12 @@ class Dashboard extends React.Component {
         {label: 'positive', score: 50},
         {label: 'negative', score: 50},
       ],
-      facebookData:[
-        {label: 'loves', score: 20},
-        {label: 'wows', score: 20},
-        {label: 'hahas', score: 20},
-        {label: 'sads', score: 20},
-        {label: 'angrys', score: 20},
+      emoData:[
+        {label: 'anger', score: 20},
+        {label:'joy', score: 20},
+        {label:'fear', score: 20},
+        {label:'sadness', score: 20},
+        {label:'surprise', score: 20}
       ],
       publicSentiment: '',
       emotionalFeedback: '',
@@ -60,6 +62,41 @@ class Dashboard extends React.Component {
 /**************************
  * Map Component Logic
  **************************/
+<<<<<<< f3179017d2d3f55a61feeb99956fb6a338712129
+=======
+  clickHandler() {
+    var that = this;
+
+    // setTimeout(function() {
+    //   this.state.map.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+    //     console.log('geography is', geography);
+    //     var obj = {target: {value: geography.id}};
+    //     that.handleFormChange(obj);
+    //     for (var i = 0; i < that.state.countriesArr.length; i++) {
+    //       if (that.state.countriesArr[i][2] === geography.id) {
+    //         that.googleTrendGrab(that.state.countriesArr[i][1]);
+    //         return;
+    //       }
+    //     }
+    //   });
+    // }.bind(this), 2000);
+  }
+
+  handleFormChange (e) {
+    var clickedCountry = e.target.value;
+    //Toggle former selected country's map color to default
+    this.toggleMapColors(this.state.selectedCountry);
+
+    //Change the selected country in state
+    this.setState({selectedCountry: e.target.value});
+
+    //Toggle new selected country's map color to default
+    //Uses setTimeout because the setState requires time to update
+    setTimeout(function() {
+      this.toggleMapColors(clickedCountry)
+    }.bind(this), 250);
+  }
+>>>>>>> add donut chart serverside and client side
 
   getObjectValues(obj) {
     var values = [];
@@ -77,11 +114,18 @@ class Dashboard extends React.Component {
     this.setState( {
       currentTrend: e
     })
+<<<<<<< f3179017d2d3f55a61feeb99956fb6a338712129
     if(this.state.currentChart === "twitterChart"){
       this.twitterGrab(e);
       this.updateNewsTopHeadlines(e);
       this.topTweetGrab(e);
     }
+=======
+    this.twitterGrab(e);
+    this.updateNewsTopHeadlines(e);
+    this.getEmoChart();
+    this.topTweetGrab(e);
+>>>>>>> add donut chart serverside and client side
   }
 
 getObjectValues(obj) {
@@ -114,9 +158,14 @@ getObjectValues(obj) {
         console.log(history, 'THIS IS ALL THE HISTORY DATA')
         context.setState({
           historyArray: history,
+<<<<<<< f3179017d2d3f55a61feeb99956fb6a338712129
           trendScore: context.getObjectValues(history[history.length-1])[0],
           historicalTrendArray: dataPoints
         })
+=======
+          trendScore: context.getObjectValues(history[history.length-1])[0]
+        });
+>>>>>>> add donut chart serverside and client side
       },
       dataType: 'json'
     });
@@ -125,7 +174,6 @@ getObjectValues(obj) {
 
 getTrends () {
     //pull in data from google trends to populate dropdown menu
-
     var context = this;
     $.get('http://localhost:4000/trends', function(data){
       context.setState({
@@ -198,14 +246,19 @@ getTrends () {
     this.setState({
       currentTrend: q
     })
+<<<<<<< f3179017d2d3f55a61feeb99956fb6a338712129
     if(this.state.currentChart === "twitterChart"){
       this.twitterGrab(q);
     } else {
       //this.facebookGrab(q);
     }
     this.getHistory(q);
+=======
+    this.twitterGrab(q);
+>>>>>>> add donut chart serverside and client side
     this.updateNewsTopHeadlines(q);
     this.topTweetGrab(q);
+    this.getEmoChart()
   }
 
 
@@ -262,6 +315,76 @@ getTrends () {
     .text(function(d) {return d.data.label;});
   }
 
+<<<<<<< f3179017d2d3f55a61feeb99956fb6a338712129
+=======
+  worldMap() {
+    this.state.map = new Datamap({
+      element: document.getElementById('worldMapContainer'),
+      responsive: true,
+      geographyConfig: {
+        popupOnHover: true
+      },
+      fills: {
+          SELECTED: 'red',
+          UNSELECTED: 'green',
+          defaultFill: 'gray'
+      }
+    })
+    var selectedCountry = this.state.selectedCountry;
+    var map = this.state.map;
+    this.state.countriesArr.map(function(triple) {
+      var obj = {}
+      var toggle = (triple[1] === selectedCountry) ? 'SELECTED' : 'UNSELECTED';
+      obj[triple[2]] = {'fillKey': toggle};
+      map.updateChoropleth(obj);
+    });
+    d3.select(window).on('resize', function() {
+      map.resize();
+    });
+  }
+
+  toggleDisplay(){
+    var currentChart = d3.select('#sentimentChart').selectAll('svg');
+    var currentChartClass = currentChart[0][0].className.animVal;
+    d3.select('#sentimentChart').selectAll('svg').remove();
+    var update;
+    if(this.state.currentChart === 'emoChart') {
+      this.updateChart(this.state.twitterData, '#sentimentChart');
+      update = 'twitterChart'
+    } else {
+      updateDonutChart(this.state.emoData);
+      update = 'emoChart'
+    }
+    this.setState({
+      currentChart: update
+    })
+    //toggle to properchart in return 
+  }
+
+  getEmoChart(){
+    var context = this
+    $.ajax({
+      method: "GET",
+      url: 'http://localhost:4000/emo',
+      contentType: "application/json",
+      dataType: 'json',
+      success: function(d){
+        context.setState({
+        emoData : [
+          {label: 'anger', score:d.anger},
+          {label:'joy', score: d.joy},
+          {label:'fear', score: d.fear},
+          {label:'sadness', score: d.sadness},
+          {label:'surprise', score: d.surprise}
+          ],
+          twitterSpinner : false,
+        });
+      // updateDonutChart(this.state.getEmoChart)
+      },
+    });
+  }
+
+>>>>>>> add donut chart serverside and client side
   updateNewsTopHeadlines(keyword) {
     var context = this;
     var url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
@@ -292,6 +415,7 @@ getTrends () {
       throw err;
     });
   }
+ 
 
   render () {
     var header = {
@@ -352,8 +476,13 @@ getTrends () {
       paddingRight: '27.5px'
     };
 
+    var sentiment1Chart;
+    if(this.state.currentChart === 'twitterChart') {
+      sentiment1Chart =  <Loader color="#26A65B " size="16px" margin="4px"/>               
+    } else {
+      sentiment1Chart = toggleComponent 
+    }
     return (
-      
       <Grid>
           <Row>
             <Navbar style={header}>
@@ -378,7 +507,7 @@ getTrends () {
                     }.bind(this))
                   }
                 </NavDropdown>
-                <Button >Toggle Display</Button>
+                <Button onClick={this.toggleDisplay.bind(this)}>Toggle Display</Button>
               </Nav>
               <Search search={this.searchTrend.bind(this)} />
             </Navbar>
@@ -401,7 +530,7 @@ getTrends () {
               <div style={outline}>
                 <h1 style={titular}>SENTIMENT ANALYSIS</h1>
                 <div id="sentimentChart" style={sentimentChart}>
-                  {this.state.twitterSpinner ? <Loader color="#26A65B " size="16px" margin="4px"/> : <div></div>}
+                  {sentiment1Chart}
                 </div>
               </div>
             </Col>

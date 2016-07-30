@@ -62,8 +62,7 @@ class Dashboard extends React.Component {
 /**************************
  * Map Component Logic
  **************************/
-<<<<<<< f3179017d2d3f55a61feeb99956fb6a338712129
-=======
+
   clickHandler() {
     var that = this;
 
@@ -96,7 +95,7 @@ class Dashboard extends React.Component {
       this.toggleMapColors(clickedCountry)
     }.bind(this), 250);
   }
->>>>>>> add donut chart serverside and client side
+
 
   getObjectValues(obj) {
     var values = [];
@@ -114,18 +113,12 @@ class Dashboard extends React.Component {
     this.setState( {
       currentTrend: e
     })
-<<<<<<< f3179017d2d3f55a61feeb99956fb6a338712129
-    if(this.state.currentChart === "twitterChart"){
-      this.twitterGrab(e);
-      this.updateNewsTopHeadlines(e);
-      this.topTweetGrab(e);
-    }
-=======
+
     this.twitterGrab(e);
     this.updateNewsTopHeadlines(e);
     this.getEmoChart();
     this.topTweetGrab(e);
->>>>>>> add donut chart serverside and client side
+
   }
 
 getObjectValues(obj) {
@@ -158,14 +151,9 @@ getObjectValues(obj) {
         console.log(history, 'THIS IS ALL THE HISTORY DATA')
         context.setState({
           historyArray: history,
-<<<<<<< f3179017d2d3f55a61feeb99956fb6a338712129
           trendScore: context.getObjectValues(history[history.length-1])[0],
           historicalTrendArray: dataPoints
         })
-=======
-          trendScore: context.getObjectValues(history[history.length-1])[0]
-        });
->>>>>>> add donut chart serverside and client side
       },
       dataType: 'json'
     });
@@ -246,16 +234,14 @@ getTrends () {
     this.setState({
       currentTrend: q
     })
-<<<<<<< f3179017d2d3f55a61feeb99956fb6a338712129
+
     if(this.state.currentChart === "twitterChart"){
       this.twitterGrab(q);
     } else {
       //this.facebookGrab(q);
     }
     this.getHistory(q);
-=======
-    this.twitterGrab(q);
->>>>>>> add donut chart serverside and client side
+
     this.updateNewsTopHeadlines(q);
     this.topTweetGrab(q);
     this.getEmoChart()
@@ -315,8 +301,7 @@ getTrends () {
     .text(function(d) {return d.data.label;});
   }
 
-<<<<<<< f3179017d2d3f55a61feeb99956fb6a338712129
-=======
+
   worldMap() {
     this.state.map = new Datamap({
       element: document.getElementById('worldMapContainer'),
@@ -384,7 +369,6 @@ getTrends () {
     });
   }
 
->>>>>>> add donut chart serverside and client side
   updateNewsTopHeadlines(keyword) {
     var context = this;
     var url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";

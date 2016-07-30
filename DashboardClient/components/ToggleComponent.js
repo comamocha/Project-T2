@@ -23,7 +23,6 @@ export default class ToggleComponent extends React.Component {
               <p className="percentage">N/A<sup>%</sup></p>
           </li>
           <li>
-            funny
               <p className="funny split scnd-font-color">Funny</p>
               <p className="percentage">N/A<sup>%</sup></p>
           </li>

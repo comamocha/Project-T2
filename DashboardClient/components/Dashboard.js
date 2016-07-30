@@ -103,44 +103,69 @@ class Dashboard extends React.Component {
 /**************************
  * Map Component Logic
  **************************/
+  clickHandler() {
+    var that = this;
+
+    setTimeout(function() {
+      this.state.map.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+        console.log('geography is', geography);
+        var obj = {target: {value: geography.id}};
+        that.handleFormChange(obj);
+        for (var i = 0; i < that.state.countriesArr.length; i++) {
+          if (that.state.countriesArr[i][2] === geography.id) {
+            that.googleTrendGrab(that.state.countriesArr[i][1]);
+            return;
+          }
+        }
+      });
+    }.bind(this), 2000);
+  }
+
   handleFormChange (e) {
     var clickedCountry = e.target.value;
     //Toggle former selected country's map color to default
-    this.toggleMapColors(clickedCountry);
+    this.toggleMapColors(this.state.selectedCountry);
 
     //Change the selected country in state
     this.setState({selectedCountry: e.target.value});
 
     //Toggle new selected country's map color to default
     //Uses setTimeout because the setState requires time to update
-    setTimeout(function() {this.toggleMapColors(clickedCountry)}.bind(this), 250);
+    setTimeout(function() {
+      this.toggleMapColors(clickedCountry)
+    }.bind(this), 250);
   }
 
   toggleMapColors (clickedCountry) {
     //Google's Trend API requires 2-digit country-codes
     //Datamaps requires 3-digit country-codes
     //For loop will find the corresponding 3-digit country-code for selected item
-    var countryCode = null;
-    for (var i = 0; i < this.state.countriesArr.length; i++) {
-      if (this.state.countriesArr[i][1] === this.state.selectedCountry) {
-        countryCode = this.state.countriesArr[i][2];
+    var countryCode = clickedCountry;
+    
+    if (clickedCountry.length !== 3) {
+      for (var i = 0; i < this.state.countriesArr.length; i++) {
+        if (this.state.countriesArr[i][1] === this.state.selectedCountry) {
+          countryCode = this.state.countriesArr[i][2];
+        }
       }
     }
+    console.log('clickedCountry is', clickedCountry);
 
     //Create the object to toggle map color 
     var toggleVar = this.state.map.options.data[countryCode]['fillKey'] === 'SELECTED';
     var fillKey = (toggleVar) ? 'UNSELECTED' : 'SELECTED';
     var obj = {};
     obj[countryCode] = {fillKey: fillKey};
-
+    console.log(obj);
     //Update map color
     this.state.map.updateChoropleth(obj);
   }
 
   googleTrendGrab (countryCode) {
-    console.log('googleTrendGrab countryCode is', countryCode);
+    var that = this;
     $.get('http://localhost:3000/test', countryCode, function(list) {
-      document.getElementById('googleTrendGrabTarget').innerText = list;
+        console.log('googleTrendGrab countrycode is', countryCode);
+        that.setState({trends: list.split('\n') })
     });
   }
 
@@ -381,11 +406,7 @@ getTrends () {
       element: document.getElementById('worldMapContainer'),
       responsive: true,
       geographyConfig: {
-        popupOnHover: true,
-        popupTemplate: function(geography, data) { // This function should just return a string
-          // var lookup = googleTrendGrab(geography.properties.name);
-          return googleTrendGrab(geography.properties.name);
-        }
+        popupOnHover: true
       },
       fills: {
           SELECTED: 'red',
@@ -398,13 +419,8 @@ getTrends () {
     var map = this.state.map;
     this.state.countriesArr.map(function(triple) {
       var obj = {}
-      if(triple[1] === selectedCountry) {
-        console.log('inside true')
-        obj[triple[2]] = {'fillKey': 'SELECTED'};
-      } else {
-        console.log('inside false')
-        obj[triple[2]] = {'fillKey': 'UNSELECTED'};
-      }
+      var toggle = (triple[1] === selectedCountry) ? 'SELECTED' : 'UNSELECTED';
+      obj[triple[2]] = {'fillKey': toggle};
       map.updateChoropleth(obj);
     });
 
@@ -705,6 +721,7 @@ getTrends () {
             <Col xs={6} md={4}><MidTab loading={this.state.twitterSpinner} info={this.state.publicSentiment} header="PUBLIC SENTIMENT" sub={this.state.twitterSummary}/></Col>
             <Col xs={6} md={4}><RightTab info={this.state.emotionalFeedback} header={"EMOTIONAL FEEDBACK"} sub={this.state.facebookSummary}/></Col>
           </Row>
+
           <Row>
             <Col md={6} mdPush={6}>
               <Row>  
@@ -750,23 +767,13 @@ getTrends () {
               </div>
             </Col>
           </Row>
+
           <Row>
             <div style={outline}>
+              
               <h1 style={titular}>World Map</h1>
-              <div id="worldMapContainer" style={{top: '-15%', height: '90%'}}></div>
-              <form onSubmit={this.googleTrendGrab(this.state.selectedCountry)}>
-                <p style={{color: 'white'}}>Select a country:</p>
-                <select id="countriesDropDown" name="Countries" value={this.state.selectedCountry}
-                  onChange={this.handleFormChange.bind(this)}>{
-                  this.state.countriesArr.map(function(tuple) {
-                    return <option value={tuple[1]}>{tuple[0]}</option>
-                  })
-                }</select>
-              </form>
+              <div id="worldMapContainer" style={{top: '-15%', height: '90%'}} onClick={this.clickHandler()}></div>
             </div>
-          </Row>
-          <Row>
-            <div id='googleTrendGrabTarget' style={{color: 'white'}}></div>
           </Row>
       </Grid>
     );

@@ -4,12 +4,15 @@ var Promise = require('bluebird');
 
 
 module.exports = {
-	getSentiment : function(string) {
+	getSentiment : function(string, req, res) {
 		return new Promise(function(resolve, reject){
-			console.log("HELLO")
 			indico.sentimentHQ(string)
-				.then(function(res){console.log(res)})
-				.catch(function(err){console.log(err)})
+				.then(function(data){
+					var positive = Math.floor(data * 100);
+					var negative = 100 - positive;
+					res.send({summary: 'Mostly Negative', positive: positive, negative: negative});
+				})
+
 				// ,
 				//  function (err, response) {
 				// if (err) {

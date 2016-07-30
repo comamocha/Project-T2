@@ -18,11 +18,8 @@ export default class SearchComponent extends React.Component {
 
   searchClick(){
   	var context = this;
-  //twitter api call for this.state onClick
   	context.props.search(this.state.search)
   }
-
-
 
   render() {
     return (
@@ -32,7 +29,6 @@ export default class SearchComponent extends React.Component {
           <Button onClick={this.searchClick.bind(this)}>Search Trend</Button>
         </span>
       </span>
-
     );
   }
 }

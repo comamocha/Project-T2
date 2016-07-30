@@ -1,9 +1,7 @@
 var routes = require('express').Router();
 var googleTrends = require('google-trends-api');
 var Twitter = require('twitter');
-var fs = require('fs');
 var api_key = require('../../api_keys.js')
-var db = require('../database');
 var watson = require('watson-developer-cloud');
 var Promise = require('bluebird');
 var {getSentiment, politicalAnalysis, emotionalAnalysis, personalityTraits} = require('./IndicoApi.js')
@@ -138,9 +136,8 @@ module.exports = {
 									delete storage[key]
 								}
 							}
-							console.log("here!!!")
-						
-							getSentiment(tweetString).then(function(data) {
+							console.log(tweetString)
+							getSentiment(tweetString, req, res).then(function(data) {
 								
 								var positive = 0;
 								var negative = 0;
@@ -157,6 +154,7 @@ module.exports = {
 								// 	positive = 1 - negative;
 								// 	res.send({summary: 'Mostly Negative', positive: positive, negative: negative});
 								// }
+
 							});
 							
 						});

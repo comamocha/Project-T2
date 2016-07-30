@@ -1,15 +1,18 @@
 import React from 'react';
-import Search from './SearchComponent';
-import LeftTab from './leftTab';
-import MidTab from './MidTab';
-import RightTab from './RightTab';
-import TabPopularTweets from './TabPopularTweets';
-import TabNewsHeadlines from './TabNewsHeadlines';
 import ReactDOM from 'react-dom';
 import Loader from 'halogen/PulseLoader';
 import {Grid, Row, Col, Clearfix, Panel, Well, Button, Glyphicon} from 'react-bootstrap';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, Image, Jumbotron} from 'react-bootstrap';
 import {Router, Route, Link, hashHistory, IndexRoute} from 'react-router';
+
+import LeftTab from './leftTab';
+import WorldMap from  './DashboardComponents/map/WorldMap';
+import MidTab from './MidTab';
+import RightTab from './RightTab';
+import TabPopularTweets from './TabPopularTweets';
+import TabNewsHeadlines from './TabNewsHeadlines';
+import Search from './SearchComponent.js';
+
 
 var styles = {
   'background-color': 'black'
@@ -19,37 +22,6 @@ class Dashboard extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      map: null,
-      countriesArr: [
-        ['Argentina', 'AR', 'ARG'],
-        ['Australia', 'AU', 'AUS'],
-        ['Austria', 'AT', 'AUT'],
-        ['Belgium', 'BE', 'BEL'],
-        ['Brazil', 'BR', 'BRA'],
-        ['Canada', 'CA', 'CAN'],
-        ['Chile', 'CL', 'CHL'],
-        ['Colombia', 'CO', 'COL'],
-        ['France', 'FR', 'FRA'],
-        ['Germany', 'DE', 'DEU'],
-        ['India', 'IN', 'IND'],
-        ['Italy', 'IT', 'ITA'],
-        ['Japan', 'JP', 'JPN'],
-        ['Malaysia', 'MY', 'MYS'],
-        ['Mexico', 'MX', 'MEX'],
-        ['Netherlands', 'NL', 'NLD'],
-        ['Norway', 'NO', 'NOR'],
-        ['Philippines', 'PH', 'PHL'],
-        ['Poland', 'PL', 'POL'],
-        ['Portugal', 'PT', 'PRT'],
-        ['Russia', 'RU', 'RUS'],
-        ['Sweden', 'SE', 'SWE'],
-        ['Switzerland', 'CH', 'CHE'],
-        ['Turkey', 'TR', 'TUR'],
-        ['United Kingdom', 'GB', 'GBR'],
-        ['United States', 'US', 'USA'],
-        ['Vietnam', 'VN', 'VNM']
-      ],
-      selectedCountry: 'US',
       searchedItem: '',
       trends: [],
       currentTrend: 'Select Trend',
@@ -83,75 +55,17 @@ class Dashboard extends React.Component {
   componentDidMount () {
     this.getTrends();
     this.updateChart(this.state.twitterData, '#sentimentChart');
-    this.worldMap();
-    this.googleTrendGrab('US');
   }
 /**************************
  * Map Component Logic
  **************************/
-  clickHandler() {
-    var that = this;
 
-    setTimeout(function() {
-      this.state.map.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
-        console.log('geography is', geography);
-        var obj = {target: {value: geography.id}};
-        that.handleFormChange(obj);
-        for (var i = 0; i < that.state.countriesArr.length; i++) {
-          if (that.state.countriesArr[i][2] === geography.id) {
-            that.googleTrendGrab(that.state.countriesArr[i][1]);
-            return;
-          }
-        }
-      });
-    }.bind(this), 2000);
-  }
-
-  handleFormChange (e) {
-    var clickedCountry = e.target.value;
-    //Toggle former selected country's map color to default
-    this.toggleMapColors(this.state.selectedCountry);
-
-    //Change the selected country in state
-    this.setState({selectedCountry: e.target.value});
-
-    //Toggle new selected country's map color to default
-    //Uses setTimeout because the setState requires time to update
-    setTimeout(function() {
-      this.toggleMapColors(clickedCountry)
-    }.bind(this), 250);
-  }
-
-  toggleMapColors (clickedCountry) {
-    //Google's Trend API requires 2-digit country-codes
-    //Datamaps requires 3-digit country-codes
-    //For loop will find the corresponding 3-digit country-code for selected item
-    var countryCode = clickedCountry;
-    
-    if (clickedCountry.length !== 3) {
-      for (var i = 0; i < this.state.countriesArr.length; i++) {
-        if (this.state.countriesArr[i][1] === this.state.selectedCountry) {
-          countryCode = this.state.countriesArr[i][2];
-        }
-      }
+  getObjectValues(obj) {
+    var values = [];
+    for (var i in obj) {
+      values.push(obj[i]);
     }
-    console.log('clickedCountry is', clickedCountry);
-
-    //Create the object to toggle map color 
-    var toggleVar = this.state.map.options.data[countryCode]['fillKey'] === 'SELECTED';
-    var fillKey = (toggleVar) ? 'UNSELECTED' : 'SELECTED';
-    var obj = {};
-    obj[countryCode] = {fillKey: fillKey};
-    console.log(obj);
-    //Update map color
-    this.state.map.updateChoropleth(obj);
-  }
-  googleTrendGrab (countryCode) {
-    var that = this;
-    $.get('http://localhost:4000/test', countryCode, function(list) {
-        console.log('googleTrendGrab countrycode is', countryCode);
-        that.setState({trends: list.split('\n') })
-    });
+    return values;
   }
 
   searchTrend (e) {
@@ -162,49 +76,7 @@ class Dashboard extends React.Component {
       this.twitterGrab(e);
       this.updateNewsTopHeadlines(e);
       this.topTweetGrab(e);
-    } else {
-     // this.facebookGrab(e);
     }
-  }
-
-
-getObjectValues(obj) {
-  var values = [];
-  for (var i in obj) {
-    values.push(obj[i]);
-  }
-  return values;
-}
-
-  getHistory (q) {
-    var context = this;
-    $.ajax({
-      method: "POST",
-      url: 'http://localhost:4000/history',
-      data: JSON.stringify({q: q}),
-      contentType: "application/json",
-      success: function(d){
-        var history = d;
-        console.log(history, 'THIS IS ALL THE HISTORY DATA')
-        context.setState({
-          historyArray: history,
-          trendScore: context.getObjectValues(history[history.length-1])[0]
-        })
-      },
-      dataType: 'json'
-    });
-  }
-
-
-getTrends () {
-    //pull in data from google trends to populate dropdown menu
-
-    var context = this;
-    $.get('http://localhost:4000/trends', function(data){
-      context.setState({
-        trends: data
-      })
-    });
   }
 
   //pull in twitter data from watson to populate twitter chart
@@ -333,35 +205,8 @@ getTrends () {
     .text(function(d) {return d.data.label;});
   }
 
-  worldMap() {
-    this.state.map = new Datamap({
-      element: document.getElementById('worldMapContainer'),
-      responsive: true,
-      geographyConfig: {
-        popupOnHover: true
-      },
-      fills: {
-          SELECTED: 'red',
-          UNSELECTED: 'green',
-          defaultFill: 'gray'
-      }
-    })
-    var selectedCountry = this.state.selectedCountry;
-    var map = this.state.map;
-    this.state.countriesArr.map(function(triple) {
-      var obj = {}
-      var toggle = (triple[1] === selectedCountry) ? 'SELECTED' : 'UNSELECTED';
-      obj[triple[2]] = {'fillKey': toggle};
-      map.updateChoropleth(obj);
-    });
-    d3.select(window).on('resize', function() {
-      map.resize();
-    });
-  }
-
   updateNewsTopHeadlines(keyword) {
     var context = this;
-    console.log("updating news headlines.")
     var url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
     url += '?' + $.param({
       'api-key': "38618d65ade0456985ffee0915ba6299",
@@ -388,6 +233,36 @@ getTrends () {
       context.setState({ NewsTopHeadlines: finalbody });
     }).fail(function (err) {
       throw err;
+    });
+  }
+
+  getHistory (q) {
+    var context = this;
+    $.ajax({
+      method: "POST",
+      url: 'http://localhost:4000/history',
+      data: JSON.stringify({q: q}),
+      contentType: "application/json",
+      success: function(d){
+        var history = d;
+        context.setState({
+          historyArray: history,
+          trendScore: context.getObjectValues(history[history.length-1])[0]
+        })
+      },
+      dataType: 'json'
+    });
+  }
+
+
+  getTrends () {
+    //pull in data from google trends to populate dropdown menu
+
+    var context = this;
+    $.get('http://localhost:4000/trends', function(data){
+      context.setState({
+        trends: data
+      })
     });
   }
 
@@ -505,10 +380,7 @@ getTrends () {
             </Col>
           </Row>
           <Row>
-            <div style={outline}>              
-              <h1 style={titular}>World Map</h1>
-              <div id="worldMapContainer" style={{top: '-15%', height: '90%'}} onClick={this.clickHandler()}></div>
-            </div>
+            <WorldMap trends={function(list) { this.setState({trends: list.split('\n') })}.bind(this)} />
           </Row>
       </Grid>
     );

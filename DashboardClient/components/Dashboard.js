@@ -47,6 +47,7 @@ class Dashboard extends React.Component {
       facebookSummary: '',
       NewsTopHeadlines: '',
       trendScore: 0,
+      historicalTrendArray: [],
       facebookLikes: '',
       currentChart: 'twitterChart'
     }

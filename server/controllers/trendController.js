@@ -19,6 +19,7 @@ module.exports = {
 		// Return the hisorical data from search
 		googleTrends.trendData(req.body.q)
 		.then(function(data) {
+			console.log(data);
 			var chunk = data[0].splice(data.length-13, 13);
 			res.send(chunk);
 		})

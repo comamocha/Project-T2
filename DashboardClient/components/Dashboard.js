@@ -50,6 +50,7 @@ class Dashboard extends React.Component {
       twitterSummary: '',
       facebookSummary: '',
       NewsTopHeadlines: '',
+      trendScore: 0,
       facebookLikes: '',
       currentChart: 'twitterChart'
 
@@ -82,6 +83,14 @@ class Dashboard extends React.Component {
     this.topTweetGrab(e);
   }
 
+getObjectValues(obj) {
+  var values = [];
+  for (var i in obj) {
+    values.push(obj[i]);
+  }
+  return values;
+}
+
   getHistory (q) {
     var context = this;
     $.ajax({
@@ -93,12 +102,14 @@ class Dashboard extends React.Component {
         var history = d;
         console.log(history, 'THIS IS ALL THE HISTORY DATA')
         context.setState({
-          historyArray: history
+          historyArray: history,
+          trendScore: context.getObjectValues(history[history.length-1])[0]
         })
       },
       dataType: 'json'
     });
   }
+
 
 getTrends () {
     //pull in data from google trends to populate dropdown menu
@@ -638,7 +649,7 @@ getTrends () {
           </Row>
           <Row>
 
-            <Col xs={6} md={4}><LeftTab info={this.state.trendHistory} header={this.state.currentTrend.toUpperCase()} sub={"Trend Score: " + Math.ceil(Math.random()  * 100)}/></Col>
+            <Col xs={6} md={4}><LeftTab info={this.state.trendHistory} header={this.state.currentTrend.toUpperCase()} sub={"Trend Score: " + this.state.trendScore}/></Col>
             <Col xs={6} md={4}><MidTab loading={this.state.twitterSpinner} info={this.state.publicSentiment} header="PUBLIC SENTIMENT" sub={this.state.twitterSummary}/></Col>
             <Col xs={6} md={4}><RightTab info={this.state.emotionalFeedback} header={"TREND OVER TIME (1 YEAR)"} sub={this.state.facebookSummary}/></Col>
           </Row>

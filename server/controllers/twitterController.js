@@ -40,7 +40,7 @@ module.exports = {
 	    results.forEach(function(item) {
 	      trends += item + "\n";
 	    });
-	    res.send("Here are your google trend results for " + country + "!" + trends);
+	    res.send(trends);
 	  })
 	  .catch(function(err){
 	    res.send("there was an error :(" + err);

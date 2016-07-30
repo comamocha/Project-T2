@@ -43,7 +43,7 @@ const MidTab = (props) => {
     <div style={container}>
       <div style={menuBox}>
         <h2 style={titular}>{props.header}</h2>
-        <p style={boxText}>{props.sub ? props.sub : 'N/A'}</p> }
+        <p style={boxText}>{props.sub ? props.sub : 'N/A'}</p>
       </div>
     </div>
   );

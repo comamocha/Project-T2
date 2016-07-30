@@ -47,6 +47,7 @@ class Dashboard extends React.Component {
       facebookSummary: '',
       NewsTopHeadlines: '',
       trendScore: 0,
+      historicalTrendArray: [],
       facebookLikes: '',
       currentChart: 'twitterChart'
     }
@@ -68,6 +69,10 @@ class Dashboard extends React.Component {
     return values;
   }
 
+/**************************
+ * End Map Component Logic
+ **************************/
+
   searchTrend (e) {
     this.setState( {
       currentTrend: e
@@ -77,6 +82,56 @@ class Dashboard extends React.Component {
       this.updateNewsTopHeadlines(e);
       this.topTweetGrab(e);
     }
+  }
+
+getObjectValues(obj) {
+  var values = [];
+  for (var i in obj) {
+    values.push(obj[i]);
+  }
+  return values;
+}
+
+  setHistoryDataPoints(array) {
+    var dataPointsForGraph = [];
+    for (var i = 1; i < array.length; i++) {
+      dataPointsForGraph.push({'x': i, 'y': Number(this.getObjectValues(array[i])[0])})
+      console.log(dataPointsForGraph)
+    }
+    return dataPointsForGraph;
+  }
+
+  getHistory (q) {
+    var context = this;
+    $.ajax({
+      method: "POST",
+      url: 'http://localhost:4000/history',
+      data: JSON.stringify({q: q}),
+      contentType: "application/json",
+      success: function(d){
+        var history = d;
+        var dataPoints = context.setHistoryDataPoints(history);
+        console.log(history, 'THIS IS ALL THE HISTORY DATA')
+        context.setState({
+          historyArray: history,
+          trendScore: context.getObjectValues(history[history.length-1])[0],
+          historicalTrendArray: dataPoints
+        })
+      },
+      dataType: 'json'
+    });
+  }
+
+
+getTrends () {
+    //pull in data from google trends to populate dropdown menu
+
+    var context = this;
+    $.get('http://localhost:4000/trends', function(data){
+      context.setState({
+        trends: data
+      })
+    });
   }
 
   //pull in twitter data from watson to populate twitter chart
@@ -148,9 +203,11 @@ class Dashboard extends React.Component {
     } else {
       //this.facebookGrab(q);
     }
+    this.getHistory(q);
     this.updateNewsTopHeadlines(q);
     this.topTweetGrab(q);
   }
+
 
   updateChart (data, id) {
     var width = 350, //960
@@ -233,36 +290,6 @@ class Dashboard extends React.Component {
       context.setState({ NewsTopHeadlines: finalbody });
     }).fail(function (err) {
       throw err;
-    });
-  }
-
-  getHistory (q) {
-    var context = this;
-    $.ajax({
-      method: "POST",
-      url: 'http://localhost:4000/history',
-      data: JSON.stringify({q: q}),
-      contentType: "application/json",
-      success: function(d){
-        var history = d;
-        context.setState({
-          historyArray: history,
-          trendScore: context.getObjectValues(history[history.length-1])[0]
-        })
-      },
-      dataType: 'json'
-    });
-  }
-
-
-  getTrends () {
-    //pull in data from google trends to populate dropdown menu
-
-    var context = this;
-    $.get('http://localhost:4000/trends', function(data){
-      context.setState({
-        trends: data
-      })
     });
   }
 
@@ -359,7 +386,7 @@ class Dashboard extends React.Component {
           <Row>
             <Col xs={6} md={4}><LeftTab info={this.state.trendHistory} header={this.state.currentTrend.toUpperCase()} sub={"Trend Score: " + this.state.trendScore}/></Col>
             <Col xs={6} md={4}><MidTab loading={this.state.twitterSpinner} info={this.state.publicSentiment} header="PUBLIC SENTIMENT" sub={this.state.twitterSummary}/></Col>
-            <Col xs={6} md={4}><RightTab info={this.state.emotionalFeedback} header={"EMOTIONAL FEEDBACK"} sub={this.state.facebookSummary}/></Col>
+            <Col xs={6} md={4}><RightTab id='visualisation' header={"TREND GRAPH (1 YEAR)"} sub={'graph'} plotPoints={this.state.historicalTrendArray}/></Col>
           </Row>
           <Row>
             <Col md={6} mdPush={6}>

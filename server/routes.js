@@ -23,4 +23,8 @@ router.route('/grabTopTweet')
 router.route('/grabFbook')
 	.post(facebookController.grabFbook)
 
+//test
+router.route('/test')
+  .get(twitterController.test)
+
 module.exports = router;

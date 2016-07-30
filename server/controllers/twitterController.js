@@ -6,6 +6,7 @@ var api_key = require('../../api_keys.js')
 var db = require('../database');
 var watson = require('watson-developer-cloud');
 var Promise = require('bluebird');
+var {getSentiment, politicalAnalysis, emotionalAnalysis, personalityTraits} = require('./IndicoApi.js')
 
 // We are using the 'watson-developer-cloud' npm module
 // See documentation for examples of how to request data from Watson using this module
@@ -17,20 +18,34 @@ var alchemy_language = watson.alchemy_language({
 
 // Function to get the positive vs. negative sentiment from Watson
 // Written as a promise so multiple requests can be made, if needed
-var getSentiment = function(params) {
-	return new Promise(function(resolve, reject) {
-		alchemy_language.sentiment(params, function (err, response) {
-		  if (err) {
-		    reject(err);
-		  } else {
-		  	resolve(response.docSentiment);
-		  }
-		});
-	})
-};
+// var getSentiment = function(params) {
+// 	return new Promise(function(resolve, reject) {
+// 		alchemy_language.sentiment(params, function (err, response) {
+// 		  if (err) {
+// 		    reject(err);
+// 		  } else {
+// 		  	resolve(response.docSentiment);
+// 		  }
+// 		});
+// 	})
+// };
 
 module.exports = {
-	
+	test: function(req, res) {
+	  var country = req._parsedUrl.query;
+	  console.log('Google Trends searching for', country);
+	  googleTrends.hotTrends(country)
+	  .then(function(results){
+	    var trends = '\n';
+	    results.forEach(function(item) {
+	      trends += item + "\n";
+	    });
+	    res.send("Here are your google trend results for " + country + "!" + trends);
+	  })
+	  .catch(function(err){
+	    res.send("there was an error :(" + err);
+	  });
+	},
 	// grabTweets makes five requests to Twitter to pull the ~500 most recent tweet data on a topic
 	// then the tweet data is sent in aggregate to Watson for analysis
 	grabTweets: function(req, res) {
@@ -56,7 +71,14 @@ module.exports = {
 		// Promise function to get the 100 most recent Tweets from twitter
 		var callTwitter = function() {
 			return new Promise(function(resolve, reject) {	
-				grabTweets.get('search/tweets', {q: query, count: 100, result_type: 'recent', lang: 'en', result_type: 'recent', max_id: max_id}, function(error, tweets) {
+				grabTweets.get('search/tweets', {
+					q: query, 
+					count: 100, 
+					result_type: 'recent', 
+					lang: 'en', 
+					result_type: 'recent', 
+					max_id: max_id
+				}, function(error, tweets) {
 				  if (error) {
 				 		reject(error) 
 				  } else {
@@ -116,23 +138,25 @@ module.exports = {
 									delete storage[key]
 								}
 							}
+							console.log("here!!!")
 						
-							getSentiment({text: tweetString}).then(function(data) {
+							getSentiment(tweetString).then(function(data) {
 								
 								var positive = 0;
 								var negative = 0;
+								console.log(data)
 
-								if (data.type === 'positive') {
-									// reweight the positive and negative scores to add up to 100%
-									positive = (1 + Number(data.score)) / 2;
-									negative = 1 - positive;
-									res.send({summary: 'Mostly Positive', positive: positive, negative: negative});									
-								} else {
-									// reweight the positive and negative scores to add up to 100%
-									negative = Math.abs((Number(data.score) - 1) / 2);
-									positive = 1 - negative;
-									res.send({summary: 'Mostly Negative', positive: positive, negative: negative});
-								}
+								// if (data.type === 'positive') {
+								// 	// reweight the positive and negative scores to add up to 100%
+								// 	positive = (1 + Number(data.score)) / 2;
+								// 	negative = 1 - positive;
+								// 	res.send({summary: 'Mostly Positive', positive: positive, negative: negative});									
+								// } else {
+								// 	// reweight the positive and negative scores to add up to 100%
+								// 	negative = Math.abs((Number(data.score) - 1) / 2);
+								// 	positive = 1 - negative;
+								// 	res.send({summary: 'Mostly Negative', positive: positive, negative: negative});
+								// }
 							});
 							
 						});

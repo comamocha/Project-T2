@@ -17,4 +17,7 @@ router.route('/grabTweets')
 router.route('/grabTopTweet')
 	.post(twitterController.grabTopTweet)
 
+router.route('/test')
+  .get(twitterController.test)
+
 module.exports = router;

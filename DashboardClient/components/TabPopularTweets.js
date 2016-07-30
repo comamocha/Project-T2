@@ -2,7 +2,6 @@ import React from 'react';
 import {Panel, Well, Button, Glyphicon} from 'react-bootstrap';
 import {Image, PageHeader, small} from 'react-bootstrap';
 
-
 var container = {
 	'height': '250px',
 	'float': 'left',
@@ -50,11 +49,11 @@ const TabPopularTweets = (props) => {
   return (
     <div style={container}>
       <div style={menuBox}>
-          <h2 style={titular}><Glyphicon glyph="retweet" style ={glyphOffset}/>{props.header}</h2>
-          <p style={boxText}><a class="tweet-link" href="#17">{props.sub1}</a> {props.sub2}</p>
-          <p style={timeSent}>{props.sub3}</p>
-          <p style={boxText}><a class="tweet-link" href="#17">{props.sub4}</a> {props.sub5}</p>
-          <p style={timeSent}>{props.sub6}</p>
+        <h2 style={titular}><Glyphicon glyph="retweet" style ={glyphOffset}/>{props.header}</h2>
+        <p style={boxText}><a class="tweet-link" href="#17">{props.sub1}</a> {props.sub2}</p>
+        <p style={timeSent}>{props.sub3}</p>
+        <p style={boxText}><a class="tweet-link" href="#17">{props.sub4}</a> {props.sub5}</p>
+        <p style={timeSent}>{props.sub6}</p>
       </div>
     </div>
   );

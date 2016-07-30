@@ -45,8 +45,8 @@ const TabNewsHeadlines = (props) => {
   return (
     <div style={container}>
       <div style={menuBox}>
-          <h2 style={titular}><Glyphicon glyph="globe" style ={glyphOffset}/>{props.header}</h2>
-          <div style={boxText}>{props.sub1}</div>  <div style={boxText}>{props.sub2}</div>
+        <h2 style={titular}><Glyphicon glyph="globe" style ={glyphOffset}/>{props.header}</h2>
+        <div style={boxText}>{props.sub1}</div>  <div style={boxText}>{props.sub2}</div>
       </div>
     </div>
   );

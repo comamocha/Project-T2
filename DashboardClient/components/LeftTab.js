@@ -36,13 +36,12 @@ var boxText = {
   'margin-top': '25px'
 };
 
-
 const LeftTab = (props) => {
   return (
     <div style={container}>
       <div style={menuBox}>
-          <h2 style={titular}>{props.header}</h2>
-          <p style={boxText}>{props.sub}</p>
+        <h2 style={titular}>{props.header}</h2>
+        <p style={boxText}>{props.sub}</p>
       </div>
     </div>
   );

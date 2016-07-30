@@ -17,8 +17,7 @@ export default class SearchComponent extends React.Component {
   }
 
   searchClick(){
-  	var context = this;
-  	context.props.search(this.state.search)
+  	this.props.search(this.state.search)
   }
 
   render() {

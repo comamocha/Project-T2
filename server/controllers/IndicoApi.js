@@ -8,21 +8,10 @@ module.exports = {
 		return new Promise(function(resolve, reject){
 			indico.sentimentHQ(string)
 				.then(function(data){
-					var positive = Math.floor(data * 100);
+					var positive = Math.abs(Math.floor(data * 100 - 25));
 					var negative = 100 - positive;
 					res.send({summary: 'Mostly Negative', positive: positive, negative: negative});
-				})
-
-				// ,
-				//  function (err, response) {
-				// if (err) {
-				// 	console.log(err)
-				// 	reject(err);
-				// } else {
-				// 	console.log(response)
-				// 	resolve(response)
-				// }
-			// })			
+				})		
 		})
 	},
 

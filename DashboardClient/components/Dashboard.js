@@ -148,7 +148,7 @@ class Dashboard extends React.Component {
   }
   googleTrendGrab (countryCode) {
     var that = this;
-    $.get('http://localhost:3000/test', countryCode, function(list) {
+    $.get('http://localhost:4000/test', countryCode, function(list) {
         console.log('googleTrendGrab countrycode is', countryCode);
         that.setState({trends: list.split('\n') })
     });
@@ -180,7 +180,7 @@ getObjectValues(obj) {
     var context = this;
     $.ajax({
       method: "POST",
-      url: 'http://localhost:3000/history',
+      url: 'http://localhost:4000/history',
       data: JSON.stringify({q: q}),
       contentType: "application/json",
       success: function(d){
@@ -200,7 +200,7 @@ getTrends () {
     //pull in data from google trends to populate dropdown menu
 
     var context = this;
-    $.get('http://localhost:3000/trends', function(data){
+    $.get('http://localhost:4000/trends', function(data){
       context.setState({
         trends: data
       })
@@ -217,7 +217,7 @@ getTrends () {
   
     $.ajax({
       method: "POST",
-      url: 'http://localhost:3000/grabTweets',
+      url: 'http://localhost:4000/grabTweets',
       data: JSON.stringify({q: q}),
       contentType: "application/json",
       success: function(d){
@@ -245,7 +245,7 @@ getTrends () {
 
     $.ajax({
       method: "POST",
-      url: 'http://localhost:3000/grabTopTweet',
+      url: 'http://localhost:4000/grabTopTweet',
       data: JSON.stringify({q: q}),
       contentType: "application/json",
       success: function(d){
@@ -482,12 +482,10 @@ getTrends () {
             </Navbar>
           </Row>
           <Row>
-
             <Col xs={6} md={4}><LeftTab info={this.state.trendHistory} header={this.state.currentTrend.toUpperCase()} sub={"Trend Score: " + this.state.trendScore}/></Col>
             <Col xs={6} md={4}><MidTab loading={this.state.twitterSpinner} info={this.state.publicSentiment} header="PUBLIC SENTIMENT" sub={this.state.twitterSummary}/></Col>
             <Col xs={6} md={4}><RightTab info={this.state.emotionalFeedback} header={"EMOTIONAL FEEDBACK"} sub={this.state.facebookSummary}/></Col>
           </Row>
-
           <Row>
             <Col md={6} mdPush={6}>
               <Row>  
@@ -506,10 +504,8 @@ getTrends () {
               </div>
             </Col>
           </Row>
-
           <Row>
-            <div style={outline}>
-              
+            <div style={outline}>              
               <h1 style={titular}>World Map</h1>
               <div id="worldMapContainer" style={{top: '-15%', height: '90%'}} onClick={this.clickHandler()}></div>
             </div>

@@ -7,7 +7,7 @@ import {Router, Route, Link, hashHistory, IndexRoute} from 'react-router';
 import updateDonutChart from './D3.js';
 import toggleComponent from './ToggleComponent'
 
-import LeftTab from './leftTab';
+import LeftTab from './LeftTab';
 import WorldMap from  './DashboardComponents/map/WorldMap';
 import MidTab from './MidTab';
 import RightTab from './RightTab';
@@ -142,7 +142,7 @@ getObjectValues(obj) {
     var context = this;
     $.ajax({
       method: "POST",
-      url: 'http://localhost:4000/history',
+      url: '/history',
       data: JSON.stringify({q: q}),
       contentType: "application/json",
       success: function(d){
@@ -163,7 +163,7 @@ getObjectValues(obj) {
 getTrends () {
     //pull in data from google trends to populate dropdown menu
     var context = this;
-    $.get('http://localhost:4000/trends', function(data){
+    $.get('/trends', function(data){
       context.setState({
         trends: data
       })
@@ -180,7 +180,7 @@ getTrends () {
   
     $.ajax({
       method: "POST",
-      url: 'http://localhost:4000/grabTweets',
+      url: '/grabTweets',
       data: JSON.stringify({q: q}),
       contentType: "application/json",
       success: function(d){
@@ -208,7 +208,7 @@ getTrends () {
 
     $.ajax({
       method: "POST",
-      url: 'http://localhost:4000/grabTopTweet',
+      url: '/grabTopTweet',
       data: JSON.stringify({q: q}),
       contentType: "application/json",
       success: function(d){
@@ -350,7 +350,7 @@ getTrends () {
     var context = this
     $.ajax({
       method: "GET",
-      url: 'http://localhost:4000/emo',
+      url: '/emo',
       contentType: "application/json",
       dataType: 'json',
       success: function(d){

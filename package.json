@@ -31,9 +31,9 @@
     "mysql": "^2.11.1",
     "node-cron": "^1.1.1",
     "nodemon": "^1.9.2",
-    "react": "^15.2.1",
+    "react": "^0.14.8",
     "react-bootstrap": "^0.29.5",
-    "react-dom": "^15.2.1",
+    "react-dom": "^0.14.8",
     "react-faux-dom": "^2.7.1",
     "react-fontawesome": "^1.1.0",
     "react-icons": "^2.2.1",
@@ -42,7 +42,8 @@
     "request-promise": "^4.0.2",
     "sequelize": "^3.23.6",
     "underscore": "^1.8.3",
-    "watson-developer-cloud": "^1.12.2"
+    "watson-developer-cloud": "^1.12.2",
+    "webpack": "^1.13.1"
   },
   "devDependencies": {
     "webpack": "^1.13.1"

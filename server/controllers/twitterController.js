@@ -4,6 +4,7 @@ var Twitter = require('twitter');
 var api_key = require('../../api_keys.js')
 var watson = require('watson-developer-cloud');
 var Promise = require('bluebird');
+// indico contains the methods (getSentiment & emotionAnalysis)
 var indico = require('./IndicoApi.js')
 
 // We are using the 'watson-developer-cloud' npm module

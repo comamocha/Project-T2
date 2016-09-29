@@ -42,7 +42,8 @@
     "request-promise": "^4.0.2",
     "sequelize": "^3.23.6",
     "underscore": "^1.8.3",
-    "watson-developer-cloud": "^1.12.2"
+    "watson-developer-cloud": "^1.12.2",
+    "webpack": "^1.13.1"
   },
   "devDependencies": {
     "webpack": "^1.13.1"

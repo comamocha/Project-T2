@@ -7,7 +7,7 @@ import {Router, Route, Link, hashHistory, IndexRoute} from 'react-router';
 import updateDonutChart from './D3.js';
 import toggleComponent from './ToggleComponent'
 
-import LeftTab from './leftTab';
+import LeftTab from './LeftTab';
 import WorldMap from  './DashboardComponents/map/WorldMap';
 import MidTab from './MidTab';
 import RightTab from './RightTab';

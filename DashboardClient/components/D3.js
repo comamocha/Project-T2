@@ -1,6 +1,6 @@
 import React from 'react';
 import Search from './SearchComponent';
-import LeftTab from './leftTab';
+import LeftTab from './LeftTab';
 import MidTab from './MidTab';
 import RightTab from './RightTab';
 import TabPopularTweets from './TabPopularTweets';

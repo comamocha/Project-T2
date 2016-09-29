@@ -208,7 +208,7 @@ getTrends () {
 
     $.ajax({
       method: "POST",
-      url: 'http://localhost:4000/grabTopTweet',
+      url: '/grabTopTweet',
       data: JSON.stringify({q: q}),
       contentType: "application/json",
       success: function(d){
@@ -350,7 +350,7 @@ getTrends () {
     var context = this
     $.ajax({
       method: "GET",
-      url: 'http://localhost:4000/emo',
+      url: '/emo',
       contentType: "application/json",
       dataType: 'json',
       success: function(d){

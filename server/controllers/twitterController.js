@@ -4,7 +4,7 @@ var Twitter = require('twitter');
 var api_key = require('../../api_keys.js')
 var watson = require('watson-developer-cloud');
 var Promise = require('bluebird');
-var {getSentiment, politicalAnalysis, emotionAnalysis, personalityTraits} = require('./IndicoApi.js')
+var indico = require('./IndicoApi.js')
 
 // We are using the 'watson-developer-cloud' npm module
 // See documentation for examples of how to request data from Watson using this module
@@ -73,7 +73,7 @@ var	grabTweets = function(req, res) {
 		callTwitter().then(function() {
 			callTwitter().then(function() {
 						// Send the tweets to Watson for analysis
-				getSentiment(tweetArray).then(function(data) {
+				indico.getSentiment(tweetArray).then(function(data) {
 					res.send({summary: data.summary, positive: data.positive, negative: data.negative});
 				});									
 			});
@@ -110,7 +110,7 @@ var	grabTopTweet = function(req, res) {
 
 var	emo = function(req, res) {
 	setTimeout(function(){
-		emotionAnalysis(allTweetArray).then(function(data) {
+		indico.emotionAnalysis(allTweetArray).then(function(data) {
 		allTweetArray = []
 		res.send(data)
 	})}, 1000)

@@ -1,4 +1,8 @@
-# project-trendwave
+# Trendwaves.stream
+
+
+![MacDown logo](https://s3.amazonaws.com/trendwaves/trendwave.png)
+
 
 Getting started:
 

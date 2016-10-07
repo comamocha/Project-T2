@@ -10,12 +10,10 @@ app.use(cors())
 app.use(bodyParser.json())
 
 app.use(morgan('dev'))
-
+app.use('/', express.static('../DashboardClient'))
 app.use('/', routes)
 
-app.use('/', express.static('DashboardClient'))
-
-app.use('/dashboard', express.static('DashboardClient'))
+app.use('/dashboard', express.static('../DashboardClient'))
 
 .listen(process.env.PORT || 4000, function (req, res) {
 	console.log('server is listening on 4000');

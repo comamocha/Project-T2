@@ -1,42 +1,37 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Loader from 'halogen/PulseLoader';
-import {Grid, Row, Col, Clearfix, Panel, Well, Button, Glyphicon} from 'react-bootstrap';
-import {Navbar, Nav, NavItem, NavDropdown, MenuItem, Image, Jumbotron} from 'react-bootstrap';
-import {Router, Route, Link, hashHistory, IndexRoute} from 'react-router';
+import {Grid, Row, Col, Button, Glyphicon, Navbar, Nav, NavDropdown, MenuItem} from 'react-bootstrap';
 import updateDonutChart from './D3.js';
-import toggleComponent from './ToggleComponent'
-
+import toggleComponent from './ToggleComponent';
 import LeftTab from './LeftTab';
-import WorldMap from  './DashboardComponents/map/WorldMap';
+import WorldMap from './DashboardComponents/map/WorldMap';
 import MidTab from './MidTab';
 import RightTab from './RightTab';
 import TabPopularTweets from './TabPopularTweets';
 import TabNewsHeadlines from './TabNewsHeadlines';
 import Search from './SearchComponent.js';
 
-
-var styles = {
-  'background-color': 'black'
-}
-
+/**
+ * Dashboard
+ * Main component that stores/updates state.
+ */
 class Dashboard extends React.Component {
-  constructor(props){
-    super(props);
+  constructor (props) {
+    super(props)
     this.state = {
       searchedItem: '',
       trends: [],
       currentTrend: 'Select Trend',
-      twitterData:[
+      twitterData: [
         {label: 'positive', score: 50},
-        {label: 'negative', score: 50},
+        {label: 'negative', score: 50}
       ],
-      emoData:[
+      emoData: [
         {label: 'anger', score: 20},
-        {label:'joy', score: 20},
-        {label:'fear', score: 20},
-        {label:'sadness', score: 20},
-        {label:'surprise', score: 20}
+        {label: 'joy', score: 20},
+        {label: 'fear', score: 20},
+        {label: 'sadness', score: 20},
+        {label: 'surprise', score: 20}
       ],
       publicSentiment: '',
       emotionalFeedback: '',
@@ -63,39 +58,24 @@ class Dashboard extends React.Component {
  * Map Component Logic
  **************************/
 
-  clickHandler() {
+  clickHandler () {
     var that = this;
-
-    // setTimeout(function() {
-    //   this.state.map.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
-    //     console.log('geography is', geography);
-    //     var obj = {target: {value: geography.id}};
-    //     that.handleFormChange(obj);
-    //     for (var i = 0; i < that.state.countriesArr.length; i++) {
-    //       if (that.state.countriesArr[i][2] === geography.id) {
-    //         that.googleTrendGrab(that.state.countriesArr[i][1]);
-    //         return;
-    //       }
-    //     }
-    //   });
-    // }.bind(this), 2000);
   }
 
   handleFormChange (e) {
     var clickedCountry = e.target.value;
-    //Toggle former selected country's map color to default
+    // Toggle former selected country's map color to default
     this.toggleMapColors(this.state.selectedCountry);
 
-    //Change the selected country in state
+    // Change the selected country in state
     this.setState({selectedCountry: e.target.value});
 
-    //Toggle new selected country's map color to default
-    //Uses setTimeout because the setState requires time to update
+    // Toggle new selected country's map color to default
+    // Uses setTimeout because the setState requires time to update
     setTimeout(function() {
       this.toggleMapColors(clickedCountry)
     }.bind(this), 250);
   }
-
 
   getObjectValues(obj) {
     var values = [];
@@ -108,7 +88,6 @@ class Dashboard extends React.Component {
 /**************************
  * End Map Component Logic
  **************************/
-
   searchTrend (e) {
     this.setState( {
       currentTrend: e
@@ -118,16 +97,7 @@ class Dashboard extends React.Component {
     this.updateNewsTopHeadlines(e);
     this.getEmoChart();
     this.topTweetGrab(e);
-
   }
-
-getObjectValues(obj) {
-  var values = [];
-  for (var i in obj) {
-    values.push(obj[i]);
-  }
-  return values;
-}
 
   setHistoryDataPoints(array) {
     var dataPointsForGraph = [];
@@ -159,32 +129,31 @@ getObjectValues(obj) {
     });
   }
 
-
-getTrends () {
-    //pull in data from google trends to populate dropdown menu
+  // Uses Google trends data to populate dropdown
+  getTrends () {
     var context = this;
-    $.get('/trends', function(data){
+    $.get('/trends', function (data) {
       context.setState({
         trends: data
       })
     });
   }
 
-  //pull in twitter data from watson to populate twitter chart
+  // pull in twitter data from watson to populate twitter chart
   twitterGrab (q) {
     var context = this;
     this.setState({
       currentTrend: q,
       twitterSpinner: true
     })
-  
+
     $.ajax({
-      method: "POST",
+      method: 'POST',
       url: '/grabTweets',
       data: JSON.stringify({q: q}),
-      contentType: "application/json",
-      success: function(d){
-        setTimeout(function() {
+      contentType: 'application/json',
+      success: function (d) {
+        setTimeout(function () {
           console.log(d);
         }, 2000);
         context.setState({
@@ -199,8 +168,8 @@ getTrends () {
     });
   }
 
+  // grab top tweet data to populate representative tweet panel
   topTweetGrab (q) {
-    //grab top tweet data to populate representative tweet panel
     var context = this;
     this.setState({
       currentTrend: q
@@ -228,17 +197,17 @@ getTrends () {
     });
   }
 
-  //Updates all data. API calls for NewsFeed, Twitter are set here 
+  // Updates all data. API calls for NewsFeed, Twitter are set here
   allDataGrab (q) {
     //update everything (when new trend is selected)
     this.setState({
       currentTrend: q
     })
 
-    if(this.state.currentChart === "twitterChart"){
+    if (this.state.currentChart === 'twitterChart') {
       this.twitterGrab(q);
     } else {
-      //this.facebookGrab(q);
+      // this.facebookGrab(q);
     }
     this.getHistory(q);
 
@@ -247,17 +216,14 @@ getTrends () {
     this.getEmoChart()
   }
 
-
   updateChart (data, id) {
-    var width = 350, //960
-        height = 350, //500
-        radius = Math.min(width, height) / 2;
+    var width = 350, height = 350, radius = Math.min(width, height) / 2;
 
-    //Ordinal scale w/ default domain and colors for range
+    // Ordinal scale w/ default domain and colors for range
     var color = d3.scale.ordinal()
         .range(["#F0AD44","#128085","#FAE8CD","#385052","#C74029"]);
 
-    //create arc data (to define path svg)
+    // create arc data (to define path svg)
     var arc = d3.svg.arc()
         .outerRadius(radius - 10)
         .innerRadius(0);
@@ -266,13 +232,13 @@ getTrends () {
         .outerRadius(radius - 10)
         .innerRadius(0);
 
-    //create pie layout order data
+    // create pie layout order data
     var pie = d3.layout.pie()
         .sort(null)
         .value(function(d){
           return d.score;
         });
-    //append both and svg and a g (group) element to the page. Move it over to the middle
+    // append both and svg and a g (group) element to the page. Move it over to the middle
     var svg = d3.select(id).append('svg')
               .attr('class', 'twitterChart')
               .attr('width', width)
@@ -280,19 +246,19 @@ getTrends () {
               .append('g')
               .attr('transform', 'translate(' + width / 2 + "," + height / 2 + ')');
 
-    //Apply data to pie and add g's on enter
+    // Apply data to pie and add g's on enter
     var g = svg.selectAll('.arc')
             .data(pie(data))
             .enter()
             .append('g')
             .attr('class', 'arc');
 
-    //put a path element in the g, give it a d attribute of the previously defined arc path. Grab its color from the scale range
+    // put a path element in the g, give it a d attribute of the previously defined arc path. Grab its color from the scale range
     g.append('path')
     .attr('d', arc)
     .style('fill', function(d) {return color(d.data.label);});
 
-    //put svg text elements on each g. Use the cenrtroid method to position center of the slice. Shift the dy positioning. Pull text from data
+    // put svg text elements on each g. Use the cenrtroid method to position center of the slice. Shift the dy positioning. Pull text from data
     g.append('text')
     .attr('transform', function(d){return 'translate('+ labelArc.centroid(d) + ')'; })
     .attr('dy', '.35em')
@@ -301,8 +267,7 @@ getTrends () {
     .text(function(d) {return d.data.label;});
   }
 
-
-  worldMap() {
+  worldMap () {
     this.state.map = new Datamap({
       element: document.getElementById('worldMapContainer'),
       responsive: true,
@@ -343,7 +308,7 @@ getTrends () {
     this.setState({
       currentChart: update
     })
-    //toggle to properchart in return 
+    //toggle to properchart in return
   }
 
   getEmoChart(){
@@ -384,8 +349,8 @@ getTrends () {
       //Go Through news articles and extract snippit
       result.response.docs.map(function (article, index) {
 
-        //Snippet That is clickable 
-        //Number of articles to display 
+        //Snippet That is clickable
+        //Number of articles to display
         if (index < 2) {
           finalbody.push(
             <a href={article.web_url}>
@@ -399,7 +364,6 @@ getTrends () {
       throw err;
     });
   }
- 
 
   render () {
     var header = {
@@ -462,9 +426,9 @@ getTrends () {
 
     var sentiment1Chart;
     if(this.state.currentChart === 'twitterChart') {
-      sentiment1Chart =  <Loader color="#26A65B " size="16px" margin="4px"/>               
+      sentiment1Chart =  <Loader color="#26A65B " size="16px" margin="4px"/>
     } else {
-      sentiment1Chart = toggleComponent 
+      sentiment1Chart = toggleComponent
     }
     return (
       <Grid>
@@ -503,7 +467,7 @@ getTrends () {
           </Row>
           <Row>
             <Col md={6} mdPush={6}>
-              <Row>  
+              <Row>
                 <TabPopularTweets info={this.state.trendHistory} header="MOST POPULAR TWEETS" sub1={this.state.representativeTweet1user} sub2={this.state.representativeTweet1headline} sub3={this.state.representativeTweet1time} sub4={this.state.representativeTweet2user} sub5={this.state.representativeTweet2headline} sub6={this.state.representativeTweet2time}/>
               </Row>
               <Row>
